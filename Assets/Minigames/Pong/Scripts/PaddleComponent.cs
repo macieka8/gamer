@@ -20,11 +20,10 @@ namespace gamer.pong
             _length = Mathf.Abs(transform.TransformVector(GetComponent<BoxCollider2D>().size).y);
         }
 
-        void Start()
+        void OnEnable()
         {
             _moveInputAction.action.performed += HandleMovementInput;
             _moveInputAction.action.canceled += HandleMovementInput;
-            _moveInputAction.action.Enable();
         }
 
         void FixedUpdate()
@@ -43,7 +42,7 @@ namespace gamer.pong
             }
         }
 
-        void Destroy()
+        void OnDisable()
         {
             _moveInputAction.action.performed -= HandleMovementInput;
             _moveInputAction.action.canceled -= HandleMovementInput;

@@ -29,13 +29,11 @@ namespace gamer.maingame.movement
             _rigidbody = GetComponent<Rigidbody>();
         }
 
-        void Start()
+        void OnEnable()
         {
             _movementInput.action.performed += HandleMovementInput;
             _movementInput.action.canceled += HandleMovementInput;
-            _movementInput.action.Enable();
             _jumpInput.action.performed += HandleJumpInput;
-            _jumpInput.action.Enable();
         }
 
         void Update()
@@ -62,13 +60,11 @@ namespace gamer.maingame.movement
             _rigidbody.MovePosition(_rigidbody.position + velocityDelta);
         }
 
-        void OnDestroy()
+        void OnDisable()
         {
             _movementInput.action.performed -= HandleMovementInput;
             _movementInput.action.canceled -= HandleMovementInput;
-            _movementInput.action.Disable();
             _jumpInput.action.performed -= HandleJumpInput;
-            _jumpInput.action.Disable();
         }
 
         void HandleMovementInput(InputAction.CallbackContext ctx)

@@ -1,9 +1,11 @@
 using UnityEngine;
+using gamer;
 
 namespace gamer.pong
 {
     public class GameController : MonoBehaviour
     {
+        [SerializeField] Minigame _minigame;
         [SerializeField] GameObject _game;
         [SerializeField] GameObject _menu;
 
@@ -17,6 +19,11 @@ namespace gamer.pong
         {
             _menu.SetActive(true);
             _game.SetActive(false);
+        }
+
+        public void StopMinigame()
+        {
+            _minigame.StopMinigame();
         }
     }
 }

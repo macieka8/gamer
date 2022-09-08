@@ -13,17 +13,22 @@ namespace gamer
 
         public string SceneName => _sceneName;
         public RenderTexture MinigameTexture => _minigameTexture;
+        public string InputActionMapName => _inputActionMapName;
+
+        public event System.Action onMinigameStopped;
 
         public void StartMinigame()
         {
             SceneManager.LoadSceneAsync(_sceneName, LoadSceneMode.Additive);
-            _input.SetActiveActionMap(_inputActionMapName, true);
         }
 
         public void StopMinigame()
         {
             SceneManager.UnloadSceneAsync(_sceneName);
-            _input.RestoreDefaultActionMap();
+            if (_input.ActiveActionMap.name == _inputActionMapName)
+                _input.RestoreDefaultActionMap();
+
+            onMinigameStopped?.Invoke();
         }
     }
 }

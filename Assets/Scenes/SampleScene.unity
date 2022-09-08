@@ -623,6 +623,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 328ce309dcec4924fb953a560468a2d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _input: {fileID: 11400000, guid: e8341bec109752c45a4ece5bf9eddbc3, type: 2}
   _minigame: {fileID: 11400000, guid: 72ddd4b2b43496e498ad40e891ab2767, type: 2}
   _display: {fileID: 1112452227}
 --- !u!65 &576221944

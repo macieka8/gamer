@@ -4,19 +4,49 @@ using gamer;
 
 namespace gamer.maingame.interactable
 {
+    public enum GameMachineState
+    {
+        Off,
+        On,
+        Focused
+    }
+
     public class GameMachine : MonoBehaviour, IInteractable
     {
+        [SerializeField] PlayerInputController _input;
         [SerializeField] Minigame _minigame;
         [SerializeField] RawImage _display;
+
+        GameMachineState _state = GameMachineState.Off;
 
         void Start()
         {
             _display.texture = _minigame.MinigameTexture;
+            _minigame.onMinigameStopped += HandleMachineTurnedOff;
+        }
+
+        void OnDestroy()
+        {
+            _minigame.onMinigameStopped -= HandleMachineTurnedOff;
         }
 
         public void Interact()
         {
-            _minigame.StartMinigame();
+            if (_state == GameMachineState.Off)
+            {
+                _minigame.StartMinigame();
+                _state = GameMachineState.On;
+            }
+            else if (_state == GameMachineState.On)
+            {
+                _state = GameMachineState.Focused;
+                _input.SetActiveActionMap(_minigame.InputActionMapName);
+            }
+        }
+
+        void HandleMachineTurnedOff()
+        {
+            _state = GameMachineState.Off;
         }
     }
 }

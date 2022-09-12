@@ -8,6 +8,7 @@ namespace gamer
     {
         [SerializeField] InputActionAsset _actions;
         [SerializeField] string _defaultActionMap;
+        [SerializeField] string _globalActionMap;
 
         InputActionMap _activeActionMap;
 
@@ -18,10 +19,18 @@ namespace gamer
             set => _defaultActionMap = value;
         }
 
+        public string GlobalActionMap
+        {
+            get => _globalActionMap;
+            set => _globalActionMap = value;
+        }
+
         void OnEnable()
         {
             _activeActionMap = _actions.FindActionMap(_defaultActionMap, true);
             _activeActionMap.Enable();
+            if (!string.IsNullOrEmpty(_globalActionMap))
+                _actions.FindActionMap(_globalActionMap, true).Enable();
         }
 
         public void SetActiveActionMap(string nameOrId, bool throwIfNotFound = false)

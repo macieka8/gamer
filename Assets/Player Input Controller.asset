@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _actions: {fileID: -944628639613478452, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
     type: 3}
-  _defaultActionMap: MainGame
+  _defaultActionMap: 4a608c32-043f-41e7-8992-799471de5f60
+  _globalActionMap: 

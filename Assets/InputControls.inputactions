@@ -345,6 +345,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Global",
+            "id": "e82e3fd7-5ca4-4ccf-b150-babfec79a77a",
+            "actions": [
+                {
+                    "name": "QuitMinigame",
+                    "type": "Button",
+                    "id": "65269537-20a2-4450-b153-a6b2c1033a4c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d3b388cf-91a2-44f7-a946-cd21885d7e4a",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "QuitMinigame",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

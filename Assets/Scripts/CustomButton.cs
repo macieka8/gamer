@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace gamer
 {
-    [AddComponentMenu("UI/ButtonCustom", 31)]
+    [AddComponentMenu("UI/CustomButton")]
     public class CustomButton : Selectable, IPointerClickHandler, ISubmitHandler
     {
         [SerializeField] InputActionAsset _actions;
@@ -39,7 +39,7 @@ namespace gamer
             if (!IsActive() || !IsInteractable())
                 return;
 
-            UISystemProfilerApi.AddMarker("Button.onClick", this);
+            UISystemProfilerApi.AddMarker("CustomButton.onClick", this);
             m_OnClick.Invoke();
         }
 
@@ -70,7 +70,6 @@ namespace gamer
             var actionMap = _actions.FindActionMap(_actionMapName, true);
             if (actionMap.enabled)
             {
-                Debug.Log("Navigate");
                 base.OnMove(eventData);
             }
         }

@@ -8,7 +8,6 @@ namespace gamer.maingame.interactable
     {
         Off,
         On,
-        Focused
     }
 
     public class GameMachine : MonoBehaviour, IInteractable
@@ -39,7 +38,6 @@ namespace gamer.maingame.interactable
             }
             else if (_state == GameMachineState.On)
             {
-                _state = GameMachineState.Focused;
                 _input.SetActiveActionMap(_minigame.InputActionMapName);
             }
         }

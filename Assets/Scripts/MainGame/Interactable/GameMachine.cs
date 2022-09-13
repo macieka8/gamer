@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using gamer;
 
 namespace gamer.maingame.interactable
@@ -14,13 +13,13 @@ namespace gamer.maingame.interactable
     {
         [SerializeField] PlayerInputController _input;
         [SerializeField] Minigame _minigame;
-        [SerializeField] RawImage _display;
+        [SerializeField] Renderer _display;
 
         GameMachineState _state = GameMachineState.Off;
 
         void Start()
         {
-            _display.texture = _minigame.MinigameTexture;
+            _display.material = _minigame.MinigameMaterial;
             _minigame.onMinigameStopped += HandleMachineTurnedOff;
         }
 

@@ -15,4 +15,5 @@ MonoBehaviour:
   _sceneName: PongScene
   _inputActionMapName: Pong
   _minigameTexture: {fileID: 8400000, guid: 883c34926fdd22d49a18004689fff30c, type: 2}
+  _minigameMaterial: {fileID: 2100000, guid: 7c97d500ce6ec204eab6b9cfed07ee2b, type: 2}
   _input: {fileID: 11400000, guid: e8341bec109752c45a4ece5bf9eddbc3, type: 2}

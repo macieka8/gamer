@@ -9,10 +9,12 @@ namespace gamer
         [SerializeField] string _sceneName;
         [SerializeField] string _inputActionMapName;
         [SerializeField] RenderTexture _minigameTexture;
+        [SerializeField] Material _minigameMaterial;
         [SerializeField] PlayerInputController _input;
 
         public string SceneName => _sceneName;
         public RenderTexture MinigameTexture => _minigameTexture;
+        public Material MinigameMaterial => _minigameMaterial;
         public string InputActionMapName => _inputActionMapName;
 
         public event System.Action onMinigameStopped;

@@ -1,5 +1,6 @@
 using UnityEngine;
 using gamer;
+using UnityEngine.InputSystem;
 
 namespace gamer.maingame.interactable
 {
@@ -7,13 +8,16 @@ namespace gamer.maingame.interactable
     {
         Off,
         On,
+        Focused
     }
 
     public class GameMachine : MonoBehaviour, IInteractable
     {
+        [SerializeField] InputActionReference _quitMinigameInputAction;
         [SerializeField] PlayerInputController _input;
         [SerializeField] Minigame _minigame;
         [SerializeField] Renderer _display;
+        [SerializeField] GameObject _onFocusedCamera;
 
         GameMachineState _state = GameMachineState.Off;
 
@@ -21,11 +25,13 @@ namespace gamer.maingame.interactable
         {
             _display.material = _minigame.MinigameMaterial;
             _minigame.onMinigameStopped += HandleMachineTurnedOff;
+            _quitMinigameInputAction.action.performed += HandleMinigameUnfocus;
         }
 
         void OnDestroy()
         {
             _minigame.onMinigameStopped -= HandleMachineTurnedOff;
+            _quitMinigameInputAction.action.performed -= HandleMinigameUnfocus;
         }
 
         public void Interact()
@@ -37,6 +43,8 @@ namespace gamer.maingame.interactable
             }
             else if (_state == GameMachineState.On)
             {
+                _state = GameMachineState.Focused;
+                _onFocusedCamera.SetActive(true);
                 _input.SetActiveActionMap(_minigame.InputActionMapName);
             }
         }
@@ -44,6 +52,16 @@ namespace gamer.maingame.interactable
         void HandleMachineTurnedOff()
         {
             _state = GameMachineState.Off;
+        }
+
+        void HandleMinigameUnfocus(InputAction.CallbackContext ctx)
+        {
+            if (_state == GameMachineState.Focused)
+            {
+                _input.RestoreDefaultActionMap();
+                _state = GameMachineState.On;
+                _onFocusedCamera.SetActive(false);
+            }
         }
     }
 }

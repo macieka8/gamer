@@ -22,6 +22,8 @@ namespace gamer.tetris
             _puzzleMover = new PuzzleMover(_tetrisBoard.Board);
             _puzzleMover.SetActivePuzzle(_testPuzzle, _testPosition);
 
+            UpdateSystemComponent.OnUpdate += HandleUpdate;
+
             _moveInputAction.action.performed += HandleMoveInput;
             _rotateInputAction.action.performed += HandleRotateInput;
             //todo: remove enable
@@ -31,8 +33,14 @@ namespace gamer.tetris
 
         void OnDestroy()
         {
+            UpdateSystemComponent.OnUpdate -= HandleUpdate;
             _moveInputAction.action.performed -= HandleMoveInput;
             _rotateInputAction.action.performed -= HandleRotateInput;
+        }
+
+        void HandleUpdate()
+        {
+            if (_puzzleMover.CanMoveDown()) _puzzleMover.MoveDown();
         }
 
         void HandleMoveInput(InputAction.CallbackContext ctx)

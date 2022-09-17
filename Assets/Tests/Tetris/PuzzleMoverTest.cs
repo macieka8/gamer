@@ -97,5 +97,38 @@ namespace gamer.tetris.Tests
             var value = _puzzleMover.CanMoveRight();
             Assert.AreEqual(false, value);
         }
+
+        [Test]
+        public void CanMoveDown_Ground_Collision()
+        {
+            _puzzleMover = new PuzzleMover(_emptyBoard);
+            _puzzleMover.SetActivePuzzle(_testPuzzle.Object, new int2(0, 18));
+
+            var value = _puzzleMover.CanMoveDown();
+            Assert.AreEqual(false, value);
+        }
+
+        [Test]
+        public void CanMoveDown_Valid_Move()
+        {
+            _puzzleMover = new PuzzleMover(_emptyBoard);
+            _puzzleMover.SetActivePuzzle(_testPuzzle.Object, new int2(5, 0));
+
+            var value = _puzzleMover.CanMoveDown();
+            Assert.AreEqual(true, value);
+        }
+
+        [Test]
+        public void CanMoveDown_Tile_Collision()
+        {
+            var testBoard = new TetrisBoard();
+            testBoard.SetValue(6, 5, new Tile(_testSprite));
+
+            _puzzleMover = new PuzzleMover(testBoard);
+            _puzzleMover.SetActivePuzzle(_testPuzzle.Object, new int2(5, 3));
+
+            var value = _puzzleMover.CanMoveDown();
+            Assert.AreEqual(false, value);
+        }
     }
 }

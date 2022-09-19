@@ -28,7 +28,7 @@ namespace gamer.tetris.Tests
             var tiles = new Tile[]{_testTile, _testTile, _testTile, _testTile};
             var tilesOffset = new int2[]{new int2(0,0), new int2(1,0), new int2(0,1), new int2(1,1)};
             _testPuzzle.Setup(p => p.Tiles).Returns(tiles);
-            _testPuzzle.Setup(p => p.TilesOffset).Returns(tilesOffset);
+            _testPuzzle.Setup(p => p.GetTileOffset(0)).Returns(tilesOffset);
             _testPuzzle.Setup(p => p.TilesCount).Returns(tiles.Length);
         }
 

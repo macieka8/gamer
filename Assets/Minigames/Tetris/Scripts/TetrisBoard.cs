@@ -10,6 +10,13 @@ namespace gamer.tetris
 
         Tile[,] _board = new Tile[Height, Width];
 
+        public bool IsPositionOnBoard(int2 position)
+        {
+            if (position.x < 0 || position.x >= Width) return false;
+            if (position.y < 0 || position.y >= Height) return false;
+            return true;
+        }
+
         public Tile GetValue(int x, int y)
         {
             if (x < 0 || x >= Width) throw new System.ArgumentOutOfRangeException(nameof(x));
@@ -32,6 +39,15 @@ namespace gamer.tetris
         public void SetValue(int2 position, Tile value)
         {
             SetValue(position.x, position.y, value);
+        }
+
+        public void SetValue(int2 position, IPuzzle puzzle, int rotation)
+        {
+            var offsets = puzzle.GetTileOffset(rotation);
+            for (int i = 0; i < puzzle.TilesCount; i++)
+            {
+                SetValue(position + offsets[i], puzzle.Tiles[i]);
+            }
         }
     }
 }

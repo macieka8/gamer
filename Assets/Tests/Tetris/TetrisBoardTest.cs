@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using Unity.Mathematics;
 using gamer.tetris;
+using Moq;
 
 namespace gamer.tetris.Tests
 {
@@ -12,14 +13,16 @@ namespace gamer.tetris.Tests
     {
         TetrisBoard _tetrisBoard;
         Sprite _testSprite;
+        Tile _testTile;
 
         [SetUp]
         public void Setup()
         {
             _testSprite = Sprite.Create(new Texture2D(1, 1), Rect.zero, Vector2.zero);
+            _testTile = new Tile(_testSprite);
             _tetrisBoard = new TetrisBoard();
-            _tetrisBoard.SetValue(0, 0, new Tile(_testSprite));
-            _tetrisBoard.SetValue(9, 0, new Tile(_testSprite));
+            _tetrisBoard.SetValue(0, 0, _testTile);
+            _tetrisBoard.SetValue(9, 0, _testTile);
         }
 
         [Test]
@@ -73,6 +76,43 @@ namespace gamer.tetris.Tests
         {
             Assert.That(() => _tetrisBoard.SetValue(x, y, new Tile(_testSprite)),
                 Throws.TypeOf<System.ArgumentOutOfRangeException>());
+        }
+
+        [Test]
+        public void SetValue_Puzzle_ValidInput()
+        {
+            var testPuzzle = new Mock<IPuzzle>();
+            var tiles = new Tile[]{_testTile, _testTile, _testTile, _testTile};
+            var tilesOffset = new int2[]{new int2(0,0), new int2(1,0), new int2(0,1), new int2(1,1)};
+            testPuzzle.Setup(p => p.Tiles).Returns(tiles);
+            testPuzzle.Setup(p => p.GetTileOffset(0)).Returns(tilesOffset);
+            testPuzzle.Setup(p => p.TilesCount).Returns(tiles.Length);
+
+            var position = new int2(3, 3);
+            var emptyBoard = new TetrisBoard();
+
+            emptyBoard.SetValue(position, testPuzzle.Object, 0);
+            for (int i = 0; i < testPuzzle.Object.TilesCount; i++)
+            {
+                var value = emptyBoard.GetValue(position + testPuzzle.Object.GetTileOffset(0)[i]);
+                Assert.AreEqual(_testTile, value);
+            }
+        }
+
+        [Test]
+        [TestCase(5, 10, true)]
+        [TestCase(0, 0, true)]
+        [TestCase(TetrisBoard.Width - 1, 0, true)]
+        [TestCase(0, TetrisBoard.Height - 1, true)]
+        [TestCase(TetrisBoard.Width - 1, TetrisBoard.Height - 1, true)]
+        [TestCase(-1, 10, false)]
+        [TestCase(TetrisBoard.Width, 10, false)]
+        [TestCase(5, -1, false)]
+        [TestCase(5, TetrisBoard.Height, false)]
+        public void IsPositionOnBoard_Cases(int x, int y, bool expectedValue)
+        {
+            var value = _tetrisBoard.IsPositionOnBoard(new int2(x, y));
+            Assert.AreEqual(expectedValue, value);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace gamer.tetris
             for (int i = 0; i < puzzleMover.ActivePuzzle.TilesCount; i++)
             {
                 var boardSpaceTilePosition =
-                    puzzleMover.ActivePuzzlePosition + puzzleMover.ActivePuzzle.TilesOffset[i];
+                    puzzleMover.ActivePuzzlePosition + puzzleMover.GetTilesOffset()[i];
                 var puzzle = Instantiate(_tileObject, transform);
                 puzzle.transform.localPosition =
                     new Vector3(

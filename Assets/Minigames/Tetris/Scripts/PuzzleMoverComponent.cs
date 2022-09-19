@@ -40,7 +40,15 @@ namespace gamer.tetris
 
         void HandleUpdate()
         {
-            if (_puzzleMover.CanMoveDown()) _puzzleMover.MoveDown();
+            if (_puzzleMover.CanMoveDown())
+            {
+                _puzzleMover.MoveDown();
+            }
+            else
+            {
+                _tetrisBoard.Board.SetValue(_puzzleMover.ActivePuzzlePosition, _puzzleMover.ActivePuzzle, _puzzleMover.ActivePuzzleRotation);
+                _puzzleMover.SetActivePuzzle(_testPuzzle, _testPosition);
+            }
         }
 
         void HandleMoveInput(InputAction.CallbackContext ctx)
@@ -58,7 +66,7 @@ namespace gamer.tetris
 
         void HandleRotateInput(InputAction.CallbackContext ctx)
         {
-
+            _puzzleMover.Rotate();
         }
     }
 }

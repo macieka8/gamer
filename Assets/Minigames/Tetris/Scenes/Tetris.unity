@@ -437,7 +437,7 @@ MonoBehaviour:
   _rotateInputAction: {fileID: 6547145519236456803, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
     type: 3}
   _tetrisBoard: {fileID: 738407059}
-  _testPuzzle: {fileID: 11400000, guid: 7482c003092dea746860c247c83b8799, type: 2}
+  _testPuzzle: {fileID: 11400000, guid: 81e93a8ca49678c47aefba94d12e4299, type: 2}
   _testPosition:
     x: 5
     y: 2
@@ -485,7 +485,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6c3fa46c0a3b3c47a762f14d377d2ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _timeBetweenUpdatesInSeconds: 1
+  _timeBetweenUpdatesInSeconds: 0.7
 --- !u!4 &898792677
 Transform:
   m_ObjectHideFlags: 0

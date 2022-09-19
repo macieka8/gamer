@@ -9,9 +9,9 @@ namespace gamer.tetris
         [SerializeField] InputActionReference _moveInputAction;
         [SerializeField] InputActionReference _rotateInputAction;
         [SerializeField] TetrisBoardComponent _tetrisBoard;
+        [SerializeField] PuzzleFeederComponent _puzzleFeeder;
 
-        [SerializeField] Puzzle _testPuzzle;
-        [SerializeField] int2 _testPosition;
+        [SerializeField] int2 _spawnPosition;
 
         PuzzleMover _puzzleMover;
 
@@ -20,7 +20,7 @@ namespace gamer.tetris
         void Start()
         {
             _puzzleMover = new PuzzleMover(_tetrisBoard.Board);
-            _puzzleMover.SetActivePuzzle(_testPuzzle, _testPosition);
+            _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetRandom(), _spawnPosition);
 
             UpdateSystemComponent.OnUpdate += HandleUpdate;
 
@@ -47,7 +47,7 @@ namespace gamer.tetris
             else
             {
                 _tetrisBoard.Board.SetValue(_puzzleMover.ActivePuzzlePosition, _puzzleMover.ActivePuzzle, _puzzleMover.ActivePuzzleRotation);
-                _puzzleMover.SetActivePuzzle(_testPuzzle, _testPosition);
+                _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetRandom(), _spawnPosition);
             }
         }
 

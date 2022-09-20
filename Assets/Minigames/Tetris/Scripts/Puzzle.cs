@@ -9,6 +9,7 @@ namespace gamer.tetris
         public static readonly float[] rotations = {0f, 90f, 180f, 270f};
         [SerializeField] Tile[] _tiles;
         [SerializeField] int2[] _tilesOffset;
+        [SerializeField] float2 _rotationCenter;
 
         public Tile[] Tiles => _tiles;
         public int TilesCount => _tiles.Length;
@@ -25,9 +26,9 @@ namespace gamer.tetris
             var offsets = (int2[])_tilesOffset.Clone();
             for (int i = 0; i < _tilesOffset.Length; i++)
             {
-                var newX = (offsets[i].x * cos) - (offsets[i].y * sin);
-                var newY = (offsets[i].x * sin) + (offsets[i].y * cos);
-                offsets[i] = new int2((int)newX, (int)newY);
+                var newX = ((offsets[i].x - _rotationCenter.x) * cos) - ((offsets[i].y - _rotationCenter.y) * sin);
+                var newY = ((offsets[i].x - _rotationCenter.x) * sin) + ((offsets[i].y - _rotationCenter.y) * cos);
+                offsets[i] = new int2((int)Mathf.Round(newX + _rotationCenter.x), (int)Mathf.Round(newY + _rotationCenter.y));
             }
             return offsets;
         }

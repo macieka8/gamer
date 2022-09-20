@@ -27,6 +27,7 @@ namespace gamer.tetris
 
         void DrawTiles()
         {
+            if (_puzzleMover.PuzzleMover.ActivePuzzle == null) return;
             var startPosition = new Vector3(
                 -(TetrisBoard.Width / 2f) + 0.5f, (TetrisBoard.Height / 2f) - 0.5f, 0f);
             var puzzleMover = _puzzleMover.PuzzleMover;

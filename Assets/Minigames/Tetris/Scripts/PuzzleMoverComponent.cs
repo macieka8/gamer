@@ -20,7 +20,7 @@ namespace gamer.tetris
         void Start()
         {
             _puzzleMover = new PuzzleMover(_tetrisBoard.Board);
-            _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetRandom(), _spawnPosition);
+            _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetNext(), _spawnPosition);
 
             UpdateSystemComponent.OnUpdate += HandleUpdate;
 
@@ -47,7 +47,7 @@ namespace gamer.tetris
             else
             {
                 _tetrisBoard.Board.SetValue(_puzzleMover.ActivePuzzlePosition, _puzzleMover.ActivePuzzle, _puzzleMover.ActivePuzzleRotation);
-                _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetRandom(), _spawnPosition);
+                _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetNext(), _spawnPosition);
             }
         }
 

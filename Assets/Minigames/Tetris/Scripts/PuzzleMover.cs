@@ -101,5 +101,13 @@ namespace gamer.tetris
         {
             _activePuzzlePosition.y++;
         }
+
+        public void HardDropDown()
+        {
+            while(CanMoveDown())
+            {
+                MoveDown();
+            }
+        }
     }
 }

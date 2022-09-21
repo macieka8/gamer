@@ -12,30 +12,59 @@ namespace gamer.tetris
         [SerializeField] PuzzleFeederComponent _puzzleFeeder;
 
         [SerializeField] int2 _spawnPosition;
+        [SerializeField] float _moveTime;
 
         PuzzleMover _puzzleMover;
+        float _timeLeftToMove;
+        float _direction;
 
         public PuzzleMover PuzzleMover => _puzzleMover;
 
         void Start()
         {
+            _timeLeftToMove = _moveTime;
+
             _puzzleMover = new PuzzleMover(_tetrisBoard.Board);
             _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetNext(), _spawnPosition);
 
             UpdateSystemComponent.OnUpdate += HandleUpdate;
-
-            _moveInputAction.action.performed += HandleMoveInput;
-            _rotateInputAction.action.performed += HandleRotateInput;
             //todo: remove enable
+            _moveInputAction.action.performed += HandleMoveInput;
+            _moveInputAction.action.canceled += HandleMoveInput;
             _moveInputAction.action.Enable();
+            _rotateInputAction.action.performed += HandleRotateInput;
             _rotateInputAction.action.Enable();
+        }
+
+        void Update()
+        {
+            if (_timeLeftToMove <= 0f)
+            {
+                Move(_direction);
+                _timeLeftToMove = _moveTime;
+            }
+            _timeLeftToMove -= Time.deltaTime;
         }
 
         void OnDestroy()
         {
             UpdateSystemComponent.OnUpdate -= HandleUpdate;
             _moveInputAction.action.performed -= HandleMoveInput;
+            _moveInputAction.action.canceled -= HandleMoveInput;
             _rotateInputAction.action.performed -= HandleRotateInput;
+        }
+
+        void Move(float direction)
+        {
+            Debug.Log($"Move: {direction}");
+            if (direction < 0f)
+            {
+                if (_puzzleMover.CanMoveLeft()) _puzzleMover.MoveLeft();
+            }
+            else if (direction > 0f)
+            {
+                if (_puzzleMover.CanMoveRight()) _puzzleMover.MoveRight();
+            }
         }
 
         void HandleUpdate()
@@ -53,20 +82,19 @@ namespace gamer.tetris
 
         void HandleMoveInput(InputAction.CallbackContext ctx)
         {
-            var inputValue = ctx.ReadValue<float>();
-            if (inputValue < 0f)
-            {
-                if (_puzzleMover.CanMoveLeft()) _puzzleMover.MoveLeft();
-            }
-            else if (inputValue > 0f)
-            {
-                if (_puzzleMover.CanMoveRight()) _puzzleMover.MoveRight();
-            }
+            _direction = ctx.ReadValue<float>();
+            _timeLeftToMove = _moveTime * 4;
+            Move(_direction);
         }
 
         void HandleRotateInput(InputAction.CallbackContext ctx)
         {
             _puzzleMover.Rotate();
+        }
+
+        public void HardDropDown()
+        {
+            _puzzleMover.HardDropDown();
         }
     }
 }

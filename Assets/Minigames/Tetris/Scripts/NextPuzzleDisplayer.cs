@@ -13,6 +13,7 @@ namespace gamer.tetris
         void Start()
         {
             _puzzleFeeder.OnNextPuzzle += HandleNextPuzzle;
+            HandleNextPuzzle();
         }
 
         void OnDestroy()

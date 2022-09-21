@@ -56,7 +56,6 @@ namespace gamer.tetris
 
         void Move(float direction)
         {
-            Debug.Log($"Move: {direction}");
             if (direction < 0f)
             {
                 if (_puzzleMover.CanMoveLeft()) _puzzleMover.MoveLeft();

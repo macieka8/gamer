@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Mathematics;
 
 namespace gamer.tetris
@@ -48,6 +49,17 @@ namespace gamer.tetris
             {
                 SetValue(position + offsets[i], puzzle.Tiles[i]);
             }
+        }
+
+        public bool FitsOnBoard(int2[] tilesOffsets, int2 position)
+        {
+            for (int i = 0; i < tilesOffsets.Length; i++)
+            {
+                var testPosition = position + tilesOffsets[i];
+                if (!IsPositionOnBoard(testPosition)) return false;
+                if (!Tile.IsNullOrEmpty(GetValue(testPosition))) return false;
+            }
+            return true;
         }
     }
 }

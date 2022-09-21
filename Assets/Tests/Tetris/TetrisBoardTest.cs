@@ -114,5 +114,45 @@ namespace gamer.tetris.Tests
             var value = _tetrisBoard.IsPositionOnBoard(new int2(x, y));
             Assert.AreEqual(expectedValue, value);
         }
+
+        [Test]
+        [TestCase(5, 5, true)]
+        [TestCase(1, 1, true)]
+        [TestCase(0, 1, false)]
+        [TestCase(5, TetrisBoard.Height - 1, true)]
+        [TestCase(TetrisBoard.Width - 1, 1, false)]
+        public void FitsOnBoard_Empty_Board(int x, int y, bool expectedValue)
+        {
+            var offsets = new int2[] {
+                new int2(0,0),
+                new int2(1,0),
+                new int2(-1,0),
+                new int2(0,-1),
+            };
+            var value = _tetrisBoard.FitsOnBoard(offsets, new int2(x, y));
+            Assert.AreEqual(expectedValue, value);
+        }
+
+        [Test]
+        [TestCase(5, 5, false)]
+        [TestCase(4, 5, false)]
+        [TestCase(6, 5, false)]
+        [TestCase(5, 6, false)]
+        [TestCase(5, 4, true)]
+        public void FitsOnBoard_Collision_With_Tiles(int x, int y, bool expectedValue)
+        {
+            var testBoard = new TetrisBoard();
+            testBoard.SetValue(5, 5, _testTile);
+
+            var offsets = new int2[] {
+                new int2(0,0),
+                new int2(1,0),
+                new int2(-1,0),
+                new int2(0,-1),
+            };
+
+            var value = testBoard.FitsOnBoard(offsets, new int2(x, y));
+            Assert.AreEqual(expectedValue, value);
+        }
     }
 }

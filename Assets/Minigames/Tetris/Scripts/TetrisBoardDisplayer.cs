@@ -32,7 +32,7 @@ namespace gamer.tetris
             {
                 int x = i % TetrisBoard.Width;
                 int y = i / TetrisBoard.Width;
-                var currentTile = _tetrisBoard.Board.GetValue(x, y);
+                var currentTile = _tetrisBoard.GetValue(x, y);
                 if (!Tile.IsNullOrEmpty(currentTile))
                 {
                     var puzzle = Instantiate(_tileObject, transform);

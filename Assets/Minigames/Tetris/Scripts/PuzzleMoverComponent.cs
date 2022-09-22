@@ -29,7 +29,7 @@ namespace gamer.tetris
         {
             _timeLeftToMove = _moveTime;
 
-            _puzzleMover = new PuzzleMover(_tetrisBoard.Board);
+            _puzzleMover = new PuzzleMover(_tetrisBoard.ReadonlyBoard);
             _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetNext(), _spawnPosition);
 
             UpdateSystemComponent.OnUpdate += HandleUpdate;
@@ -110,7 +110,7 @@ namespace gamer.tetris
 
         void PlacePuzzleOnBoard()
         {
-            _tetrisBoard.Board.SetValue(_puzzleMover.ActivePuzzlePosition, _puzzleMover.ActivePuzzle, _puzzleMover.ActivePuzzleRotation);
+            _tetrisBoard.SetValue(_puzzleMover.ActivePuzzlePosition, _puzzleMover.ActivePuzzle, _puzzleMover.ActivePuzzleRotation);
             _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetNext(), _spawnPosition);
             _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
             _isTryingToPlacePuzzle = false;

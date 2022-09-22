@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 namespace gamer.tetris
 {
-    public class TetrisBoard
+    public class TetrisBoard : IReadonlyTetrisBoard
     {
         public const int Width = 10;
         public const int Height = 20;
@@ -60,6 +60,40 @@ namespace gamer.tetris
                 if (!Tile.IsNullOrEmpty(GetValue(testPosition))) return false;
             }
             return true;
+        }
+
+        public int[] GetFilledRows()
+        {
+            var filledRows = new List<int>();
+            for (int rowId = 0; rowId < Height; rowId++)
+            {
+                bool isFilled = true;
+                for (int x = 0; x < Width; x++)
+                {
+                    if (Tile.IsNullOrEmpty(GetValue(x, rowId)))
+                    {
+                        isFilled = false;
+                        break;
+                    }
+                }
+                if (isFilled)
+                {
+                    filledRows.Add(rowId);
+                }
+            }
+
+            return filledRows.ToArray();
+        }
+
+        public void DestroyRow(int rowId)
+        {
+            for (int i = rowId; i > 0; i--)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    SetValue(x, i, GetValue(x, i - 1));
+                }
+            }
         }
     }
 }

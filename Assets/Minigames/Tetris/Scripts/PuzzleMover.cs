@@ -7,7 +7,7 @@ namespace gamer.tetris
     public class PuzzleMover
     {
         const int FIND_ROTATION_POSITION_MAX_DISTANCE = 3;
-        TetrisBoard _tetrisBoard;
+        IReadonlyTetrisBoard _tetrisBoard;
         IPuzzle _activePuzzle;
         int2 _activePuzzlePosition;
         int _activePuzzleRotation;
@@ -16,7 +16,7 @@ namespace gamer.tetris
         public int2 ActivePuzzlePosition => _activePuzzlePosition;
         public int ActivePuzzleRotation => _activePuzzleRotation;
 
-        public PuzzleMover(TetrisBoard tetrisBoard)
+        public PuzzleMover(IReadonlyTetrisBoard tetrisBoard)
         {
             _tetrisBoard = tetrisBoard;
         }

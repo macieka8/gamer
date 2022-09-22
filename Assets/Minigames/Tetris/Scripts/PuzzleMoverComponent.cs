@@ -132,6 +132,8 @@ namespace gamer.tetris
         public void HardDropDown()
         {
             _puzzleMover.HardDropDown();
+            _timeLeftToPlacePuzzle = 0f;
+            _isTryingToPlacePuzzle = true;
         }
     }
 }

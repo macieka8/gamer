@@ -527,6 +527,8 @@ MonoBehaviour:
     x: 5
     y: 2
   _moveTime: 0.1
+  _timeBeforePlacingPuzzle: 1
+  _moveCountLimitBeforePlacingPuzzle: 16
 --- !u!4 &745840013
 Transform:
   m_ObjectHideFlags: 0

@@ -13,10 +13,15 @@ namespace gamer.tetris
 
         [SerializeField] int2 _spawnPosition;
         [SerializeField] float _moveTime;
+        [SerializeField] float _timeBeforePlacingPuzzle;
+        [SerializeField] int _moveCountLimitBeforePlacingPuzzle;
 
         PuzzleMover _puzzleMover;
         float _timeLeftToMove;
         float _direction;
+        int _currentPlacingCountLimit;
+        bool _isTryingToPlacePuzzle;
+        float _timeLeftToPlacePuzzle;
 
         public PuzzleMover PuzzleMover => _puzzleMover;
 
@@ -44,6 +49,19 @@ namespace gamer.tetris
                 _timeLeftToMove = _moveTime;
             }
             _timeLeftToMove -= Time.deltaTime;
+
+            if (_isTryingToPlacePuzzle)
+            {
+                if (_timeLeftToPlacePuzzle <= 0f
+                || _currentPlacingCountLimit >= _moveCountLimitBeforePlacingPuzzle)
+                {
+                    PlacePuzzleOnBoard();
+                }
+                else
+                {
+                    _timeLeftToPlacePuzzle -= Time.deltaTime;
+                }
+            }
         }
 
         void OnDestroy()
@@ -58,11 +76,21 @@ namespace gamer.tetris
         {
             if (direction < 0f)
             {
-                if (_puzzleMover.CanMoveLeft()) _puzzleMover.MoveLeft();
+                if (_puzzleMover.CanMoveLeft())
+                {
+                    _puzzleMover.MoveLeft();
+                    _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
+                    _currentPlacingCountLimit ++;
+                }
             }
             else if (direction > 0f)
             {
-                if (_puzzleMover.CanMoveRight()) _puzzleMover.MoveRight();
+                if (_puzzleMover.CanMoveRight())
+                {
+                    _puzzleMover.MoveRight();
+                    _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
+                    _currentPlacingCountLimit ++;
+                }
             }
         }
 
@@ -71,12 +99,22 @@ namespace gamer.tetris
             if (_puzzleMover.CanMoveDown())
             {
                 _puzzleMover.MoveDown();
+                _isTryingToPlacePuzzle = false;
+                _currentPlacingCountLimit = 0;
             }
             else
             {
-                _tetrisBoard.Board.SetValue(_puzzleMover.ActivePuzzlePosition, _puzzleMover.ActivePuzzle, _puzzleMover.ActivePuzzleRotation);
-                _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetNext(), _spawnPosition);
+                _isTryingToPlacePuzzle = true;
             }
+        }
+
+        void PlacePuzzleOnBoard()
+        {
+            _tetrisBoard.Board.SetValue(_puzzleMover.ActivePuzzlePosition, _puzzleMover.ActivePuzzle, _puzzleMover.ActivePuzzleRotation);
+            _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetNext(), _spawnPosition);
+            _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
+            _isTryingToPlacePuzzle = false;
+            _currentPlacingCountLimit = 0;
         }
 
         void HandleMoveInput(InputAction.CallbackContext ctx)

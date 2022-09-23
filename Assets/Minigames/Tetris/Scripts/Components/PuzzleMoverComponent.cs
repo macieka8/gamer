@@ -4,19 +4,35 @@ using Unity.Mathematics;
 
 namespace gamer.tetris
 {
+    public enum DropState
+    {
+        Normal,
+        SoftDrop,
+    }
     public class PuzzleMoverComponent : MonoBehaviour
     {
+        [Header("Player Inputs")]
         [SerializeField] InputActionReference _moveInputAction;
         [SerializeField] InputActionReference _rotateInputAction;
+        [SerializeField] InputActionReference _softDropInputAction;
+        [SerializeField] InputActionReference _hardDropInputAction;
+
+        [Header("References")]
         [SerializeField] TetrisBoardComponent _tetrisBoard;
         [SerializeField] PuzzleFeederComponent _puzzleFeeder;
 
-        [SerializeField] int2 _spawnPosition;
+
+        [Header("Puzzle Movement Settings")]
         [SerializeField] float _moveTime;
         [SerializeField] float _timeBeforePlacingPuzzle;
         [SerializeField] int _moveCountLimitBeforePlacingPuzzle;
+        [SerializeField] int2 _spawnPosition;
+
+        [Header("Puzzle Drop Settings")]
+        [SerializeField] float _softDropFallTime;
 
         PuzzleMover _puzzleMover;
+        DropState _dropState;
         float _timeLeftToMove;
         float _direction;
         int _currentPlacingCountLimit;
@@ -24,20 +40,31 @@ namespace gamer.tetris
 
         public PuzzleMover PuzzleMover => _puzzleMover;
 
+        void OnEnable()
+        {
+            UpdateSystemComponent.Instance.OnUpdate += HandleUpdate;
+            //todo: remove enable
+            _moveInputAction.action.performed += HandleMoveInput;
+            _moveInputAction.action.canceled += HandleMoveInput;
+            _moveInputAction.action.Enable();
+
+            _rotateInputAction.action.performed += HandleRotateInput;
+            _rotateInputAction.action.Enable();
+
+            _softDropInputAction.action.started += HandleSoftDropStarted;
+            _softDropInputAction.action.canceled += HandleSoftDropCanceled;
+            _softDropInputAction.action.Enable();
+
+            _hardDropInputAction.action.performed += HandleHardDrop;
+            _hardDropInputAction.action.Enable();
+        }
+
         void Start()
         {
             _timeLeftToMove = _moveTime;
 
             _puzzleMover = new PuzzleMover(_tetrisBoard.ReadonlyBoard);
             _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetNext(), _spawnPosition);
-
-            UpdateSystemComponent.OnUpdate += HandleUpdate;
-            //todo: remove enable
-            _moveInputAction.action.performed += HandleMoveInput;
-            _moveInputAction.action.canceled += HandleMoveInput;
-            _moveInputAction.action.Enable();
-            _rotateInputAction.action.performed += HandleRotateInput;
-            _rotateInputAction.action.Enable();
         }
 
         void Update()
@@ -46,13 +73,18 @@ namespace gamer.tetris
             UpdatePuzzlePlacing();
         }
 
-        void OnDestroy()
+        void OnDisable()
         {
-            UpdateSystemComponent.OnUpdate -= HandleUpdate;
+            UpdateSystemComponent.Instance.OnUpdate -= HandleUpdate;
             _moveInputAction.action.performed -= HandleMoveInput;
             _moveInputAction.action.canceled -= HandleMoveInput;
             _rotateInputAction.action.performed -= HandleRotateInput;
+
+            _softDropInputAction.action.started -= HandleSoftDropStarted;
+            _softDropInputAction.action.canceled -= HandleSoftDropStarted;
+            _hardDropInputAction.action.performed -= HandleHardDrop;
         }
+
 
         void UpdateMove()
         {
@@ -125,10 +157,27 @@ namespace gamer.tetris
             _puzzleMover.Rotate();
         }
 
-        public void HardDropDown()
+        void HandleSoftDropStarted(InputAction.CallbackContext ctx)
+        {
+            if (_dropState != DropState.Normal) return;
+
+            _dropState = DropState.SoftDrop;
+            UpdateSystemComponent.Instance.SetUpdateTime(_softDropFallTime);
+        }
+
+        void HandleSoftDropCanceled(InputAction.CallbackContext ctx)
+        {
+            if (_dropState != DropState.SoftDrop) return;
+
+            _dropState = DropState.Normal;
+            UpdateSystemComponent.Instance.SetDefaultUpdateTime();
+        }
+
+        void HandleHardDrop(InputAction.CallbackContext ctx)
         {
             _puzzleMover.HardDropDown();
             _timeLeftToPlacePuzzle = 0f;
+            UpdateSystemComponent.Instance.ForceUpdate();
         }
     }
 }

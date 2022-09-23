@@ -523,14 +523,19 @@ MonoBehaviour:
     type: 3}
   _rotateInputAction: {fileID: 6547145519236456803, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
     type: 3}
+  _softDropInputAction: {fileID: -4389707198244640794, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
+    type: 3}
+  _hardDropInputAction: {fileID: -6415236151786755640, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
+    type: 3}
   _tetrisBoard: {fileID: 738407059}
   _puzzleFeeder: {fileID: 1526039435}
-  _spawnPosition:
-    x: 5
-    y: 2
   _moveTime: 0.1
   _timeBeforePlacingPuzzle: 1
   _moveCountLimitBeforePlacingPuzzle: 16
+  _spawnPosition:
+    x: 5
+    y: 2
+  _softDropFallTime: 0.3
 --- !u!4 &745840013
 Transform:
   m_ObjectHideFlags: 0
@@ -575,13 +580,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6c3fa46c0a3b3c47a762f14d377d2ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _puzzleMover: {fileID: 745840012}
-  _softDropInputAction: {fileID: -4389707198244640794, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
-    type: 3}
-  _hardDropInputAction: {fileID: -6415236151786755640, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
-    type: 3}
-  _normalFallTime: 0.7
-  _softDropFallTime: 0.05
+  _updateTime: 0.7
 --- !u!4 &898792677
 Transform:
   m_ObjectHideFlags: 0

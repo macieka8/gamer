@@ -1,6 +1,3 @@
-using Unity.Mathematics;
-using UnityEngine;
-
 namespace gamer.tetris
 {
     public class UpdateSystem

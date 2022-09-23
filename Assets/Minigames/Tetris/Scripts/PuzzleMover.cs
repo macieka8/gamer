@@ -50,7 +50,6 @@ namespace gamer.tetris
             while (positionsToVisit.Count > 0)
             {
                 var currentPosition = positionsToVisit.Dequeue();
-                Debug.Log(currentPosition);
 
                 visitedPositions.Add(currentPosition);
                 if (_tetrisBoard.FitsOnBoard(offsets, currentPosition))

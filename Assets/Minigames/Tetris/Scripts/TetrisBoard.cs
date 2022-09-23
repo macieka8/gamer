@@ -42,7 +42,7 @@ namespace gamer.tetris
             SetValue(position.x, position.y, value);
         }
 
-        public void SetValue(int2 position, IPuzzle puzzle, int rotation)
+        public void SetValue(IPuzzle puzzle, int2 position, int rotation)
         {
             var offsets = puzzle.GetTileOffset(rotation);
             for (int i = 0; i < puzzle.TilesCount; i++)

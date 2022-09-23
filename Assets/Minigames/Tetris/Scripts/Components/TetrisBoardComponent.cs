@@ -59,9 +59,15 @@ namespace gamer.tetris
             OnValueSet?.Invoke();
         }
 
-        public void SetValue(int2 position, IPuzzle puzzle, int rotation)
+        public void SetValue(IPuzzle puzzle, int2 position, int rotation)
         {
-            _tetrisBoard.SetValue(position, puzzle, rotation);
+            _tetrisBoard.SetValue(puzzle, position, rotation);
+            OnValueSet?.Invoke();
+        }
+
+        public void SetValue(ActivePuzzle activePuzzle)
+        {
+            _tetrisBoard.SetValue(activePuzzle.PuzzleData, activePuzzle.Position, activePuzzle.Rotation);
             OnValueSet?.Invoke();
         }
 

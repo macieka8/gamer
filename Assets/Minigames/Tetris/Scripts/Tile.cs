@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace gamer.tetris
@@ -9,6 +10,13 @@ namespace gamer.tetris
         {
             return tile == null || tile.IsEmpty;
         }
+
+        public static int Distance(int2 a, int2 b)
+        {
+            var c = a - b;
+            return Mathf.Abs(c.x) + Mathf.Abs(c.y);
+        }
+
         [SerializeField] Sprite _sprite;
 
         public Sprite Sprite => _sprite;

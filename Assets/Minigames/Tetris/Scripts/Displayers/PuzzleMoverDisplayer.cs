@@ -30,19 +30,18 @@ namespace gamer.tetris
             if (_puzzleMover.PuzzleMover.ActivePuzzle == null) return;
             var startPosition = new Vector3(
                 -(TetrisBoard.Width / 2f) + 0.5f, (TetrisBoard.Height / 2f) - 0.5f, 0f);
-            var puzzleMover = _puzzleMover.PuzzleMover;
-            for (int i = 0; i < puzzleMover.ActivePuzzle.TilesCount; i++)
+            var activePuzzle = _puzzleMover.PuzzleMover.ActivePuzzle;
+            var puzzleOffsets = activePuzzle.GetTilesOffset();
+            for (int i = 0; i < activePuzzle.PuzzleData.TilesCount; i++)
             {
-                var boardSpaceTilePosition =
-                    puzzleMover.ActivePuzzlePosition + puzzleMover.GetTilesOffset()[i];
+                var boardSpaceTilePosition = activePuzzle.Position + puzzleOffsets[i];
                 var puzzle = Instantiate(_tileObject, transform);
                 puzzle.transform.localPosition =
                     new Vector3(
                         startPosition.x + boardSpaceTilePosition.x,
                         startPosition.y - boardSpaceTilePosition.y,
                         0f);
-                var sprite = puzzleMover.ActivePuzzle.Tiles[i].Sprite;
-                puzzle.GetComponent<SpriteRenderer>().sprite = sprite;
+                puzzle.GetComponent<SpriteRenderer>().sprite = activePuzzle.PuzzleData.Tiles[i].Sprite;
                 _tiles.Add(puzzle);
             }
         }

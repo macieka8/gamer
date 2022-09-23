@@ -91,7 +91,7 @@ namespace gamer.tetris.Tests
             var position = new int2(3, 3);
             var emptyBoard = new TetrisBoard();
 
-            emptyBoard.SetValue(position, testPuzzle.Object, 0);
+            emptyBoard.SetValue(testPuzzle.Object, position, 0);
             for (int i = 0; i < testPuzzle.Object.TilesCount; i++)
             {
                 var value = emptyBoard.GetValue(position + testPuzzle.Object.GetTileOffset(0)[i]);

@@ -20,7 +20,6 @@ namespace gamer.tetris
         float _timeLeftToMove;
         float _direction;
         int _currentPlacingCountLimit;
-        bool _isTryingToPlacePuzzle;
         float _timeLeftToPlacePuzzle;
 
         public PuzzleMover PuzzleMover => _puzzleMover;
@@ -43,14 +42,31 @@ namespace gamer.tetris
 
         void Update()
         {
+            UpdateMove();
+            UpdatePuzzlePlacing();
+        }
+
+        void OnDestroy()
+        {
+            UpdateSystemComponent.OnUpdate -= HandleUpdate;
+            _moveInputAction.action.performed -= HandleMoveInput;
+            _moveInputAction.action.canceled -= HandleMoveInput;
+            _rotateInputAction.action.performed -= HandleRotateInput;
+        }
+
+        void UpdateMove()
+        {
             if (_timeLeftToMove <= 0f)
             {
                 Move(_direction);
                 _timeLeftToMove = _moveTime;
             }
             _timeLeftToMove -= Time.deltaTime;
+        }
 
-            if (_isTryingToPlacePuzzle)
+        void UpdatePuzzlePlacing()
+        {
+            if (_puzzleMover.IsOnGround)
             {
                 if (_timeLeftToPlacePuzzle <= 0f
                 || _currentPlacingCountLimit >= _moveCountLimitBeforePlacingPuzzle)
@@ -62,65 +78,45 @@ namespace gamer.tetris
                     _timeLeftToPlacePuzzle -= Time.deltaTime;
                 }
             }
-        }
-
-        void OnDestroy()
-        {
-            UpdateSystemComponent.OnUpdate -= HandleUpdate;
-            _moveInputAction.action.performed -= HandleMoveInput;
-            _moveInputAction.action.canceled -= HandleMoveInput;
-            _rotateInputAction.action.performed -= HandleRotateInput;
+            else
+            {
+                _currentPlacingCountLimit = 0;
+            }
         }
 
         void Move(float direction)
         {
             if (direction < 0f)
             {
-                if (_puzzleMover.CanMoveLeft())
-                {
-                    _puzzleMover.MoveLeft();
-                    _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
-                    _currentPlacingCountLimit ++;
-                }
+                _puzzleMover.MoveLeft();
+                _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
+                _currentPlacingCountLimit++;
             }
             else if (direction > 0f)
             {
-                if (_puzzleMover.CanMoveRight())
-                {
-                    _puzzleMover.MoveRight();
-                    _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
-                    _currentPlacingCountLimit ++;
-                }
+                _puzzleMover.MoveRight();
+                _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
+                _currentPlacingCountLimit++;
             }
         }
 
         void HandleUpdate()
         {
-            if (_puzzleMover.CanMoveDown())
-            {
-                _puzzleMover.MoveDown();
-                _isTryingToPlacePuzzle = false;
-                _currentPlacingCountLimit = 0;
-            }
-            else
-            {
-                _isTryingToPlacePuzzle = true;
-            }
+            _puzzleMover.MoveDown();
         }
 
         void PlacePuzzleOnBoard()
         {
-            _tetrisBoard.SetValue(_puzzleMover.ActivePuzzlePosition, _puzzleMover.ActivePuzzle, _puzzleMover.ActivePuzzleRotation);
+            _tetrisBoard.SetValue(_puzzleMover.ActivePuzzle);
             _puzzleMover.SetActivePuzzle(_puzzleFeeder.GetNext(), _spawnPosition);
             _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
-            _isTryingToPlacePuzzle = false;
             _currentPlacingCountLimit = 0;
         }
 
         void HandleMoveInput(InputAction.CallbackContext ctx)
         {
             _direction = ctx.ReadValue<float>();
-            _timeLeftToMove = _moveTime * 4;
+            _timeLeftToMove = _moveTime * 4f;
             Move(_direction);
         }
 
@@ -133,7 +129,6 @@ namespace gamer.tetris
         {
             _puzzleMover.HardDropDown();
             _timeLeftToPlacePuzzle = 0f;
-            _isTryingToPlacePuzzle = true;
         }
     }
 }

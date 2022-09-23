@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using Unity.Mathematics;
 
 namespace gamer.tetris
@@ -11,11 +10,6 @@ namespace gamer.tetris
     }
     public class PuzzleMoverComponent : MonoBehaviour
     {
-        [Header("Player Inputs")]
-        [SerializeField] InputActionReference _moveInputAction;
-        [SerializeField] InputActionReference _rotateInputAction;
-        [SerializeField] InputActionReference _softDropInputAction;
-        [SerializeField] InputActionReference _hardDropInputAction;
 
         [Header("References")]
         [SerializeField] TetrisBoardComponent _tetrisBoard;
@@ -32,6 +26,8 @@ namespace gamer.tetris
         [SerializeField] float _softDropFallTime;
 
         PuzzleMover _puzzleMover;
+        IPuzzleMoverInput _input;
+
         DropState _dropState;
         float _timeLeftToMove;
         float _direction;
@@ -40,23 +36,18 @@ namespace gamer.tetris
 
         public PuzzleMover PuzzleMover => _puzzleMover;
 
+        void Awake()
+        {
+            _input = GetComponent<IPuzzleMoverInput>();
+        }
+
         void OnEnable()
         {
             UpdateSystemComponent.Instance.OnUpdate += HandleUpdate;
-            //todo: remove enable
-            _moveInputAction.action.performed += HandleMoveInput;
-            _moveInputAction.action.canceled += HandleMoveInput;
-            _moveInputAction.action.Enable();
-
-            _rotateInputAction.action.performed += HandleRotateInput;
-            _rotateInputAction.action.Enable();
-
-            _softDropInputAction.action.started += HandleSoftDropStarted;
-            _softDropInputAction.action.canceled += HandleSoftDropCanceled;
-            _softDropInputAction.action.Enable();
-
-            _hardDropInputAction.action.performed += HandleHardDrop;
-            _hardDropInputAction.action.Enable();
+            _input.OnMovementInput += HandleMoveInput;
+            _input.OnRotationInput += HandleRotateInput;
+            _input.OnSoftDropInput += HandleSoftDropInput;
+            _input.OnHardDropInput += HandleHardDrop;
         }
 
         void Start()
@@ -76,13 +67,10 @@ namespace gamer.tetris
         void OnDisable()
         {
             UpdateSystemComponent.Instance.OnUpdate -= HandleUpdate;
-            _moveInputAction.action.performed -= HandleMoveInput;
-            _moveInputAction.action.canceled -= HandleMoveInput;
-            _rotateInputAction.action.performed -= HandleRotateInput;
-
-            _softDropInputAction.action.started -= HandleSoftDropStarted;
-            _softDropInputAction.action.canceled -= HandleSoftDropStarted;
-            _hardDropInputAction.action.performed -= HandleHardDrop;
+            _input.OnMovementInput -= HandleMoveInput;
+            _input.OnRotationInput -= HandleRotateInput;
+            _input.OnSoftDropInput -= HandleSoftDropInput;
+            _input.OnHardDropInput -= HandleHardDrop;
         }
 
 
@@ -145,35 +133,37 @@ namespace gamer.tetris
             _currentPlacingCountLimit = 0;
         }
 
-        void HandleMoveInput(InputAction.CallbackContext ctx)
+        void HandleMoveInput(float direction)
         {
-            _direction = ctx.ReadValue<float>();
+            _direction = direction;
             _timeLeftToMove = _moveTime * 4f;
             Move(_direction);
         }
 
-        void HandleRotateInput(InputAction.CallbackContext ctx)
+        void HandleRotateInput()
         {
             _puzzleMover.Rotate();
         }
 
-        void HandleSoftDropStarted(InputAction.CallbackContext ctx)
+        void HandleSoftDropInput(bool isSoftDropCanceled)
         {
-            if (_dropState != DropState.Normal) return;
+            if (!isSoftDropCanceled)
+            {
+                if (_dropState != DropState.Normal) return;
 
-            _dropState = DropState.SoftDrop;
-            UpdateSystemComponent.Instance.SetUpdateTime(_softDropFallTime);
+                _dropState = DropState.SoftDrop;
+                UpdateSystemComponent.Instance.SetUpdateTime(_softDropFallTime);
+            }
+            else
+            {
+                if (_dropState != DropState.SoftDrop) return;
+
+                _dropState = DropState.Normal;
+                UpdateSystemComponent.Instance.SetDefaultUpdateTime();
+            }
         }
 
-        void HandleSoftDropCanceled(InputAction.CallbackContext ctx)
-        {
-            if (_dropState != DropState.SoftDrop) return;
-
-            _dropState = DropState.Normal;
-            UpdateSystemComponent.Instance.SetDefaultUpdateTime();
-        }
-
-        void HandleHardDrop(InputAction.CallbackContext ctx)
+        void HandleHardDrop()
         {
             _puzzleMover.HardDropDown();
             _timeLeftToPlacePuzzle = 0f;

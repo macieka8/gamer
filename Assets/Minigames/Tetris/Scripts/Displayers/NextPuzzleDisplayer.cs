@@ -45,8 +45,9 @@ namespace gamer.tetris
                 var puzzle = Instantiate(_tileObject, transform);
                 puzzle.transform.localPosition =
                     new Vector3(tileOffsets[i].x, - tileOffsets[i].y, 0f);
-                var sprite = puzzleToDraw.Tiles[i].Sprite;
-                puzzle.GetComponent<SpriteRenderer>().sprite = sprite;
+                var spriteRenderer = puzzle.GetComponent<SpriteRenderer>();
+                spriteRenderer.sprite = puzzleToDraw.Tiles[i].Sprite;
+                spriteRenderer.color = puzzleToDraw.Tiles[i].Color;
                 _tiles.Add(puzzle);
             }
         }

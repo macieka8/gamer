@@ -18,8 +18,10 @@ namespace gamer.tetris
         }
 
         [SerializeField] Sprite _sprite;
+        [SerializeField] Color _color;
 
         public Sprite Sprite => _sprite;
+        public Color Color => _color;
         public bool IsEmpty => _sprite == null;
 
         public Tile(Sprite sprite)

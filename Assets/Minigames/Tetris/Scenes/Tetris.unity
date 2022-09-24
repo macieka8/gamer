@@ -423,6 +423,7 @@ GameObject:
   - component: {fileID: 738407059}
   - component: {fileID: 738407058}
   - component: {fileID: 738407061}
+  - component: {fileID: 738407062}
   m_Layer: 0
   m_Name: Tetris Board
   m_TagString: Untagged
@@ -490,6 +491,22 @@ MonoBehaviour:
   _tileObject: {fileID: 8952076891495283436, guid: 3550945fe2b240943aca16d1d4e9edd1,
     type: 3}
   _puzzleMover: {fileID: 745840012}
+--- !u!114 &738407062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 738407057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f2265fd2d0c1e5489407bfff4e59da2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tileObject: {fileID: 749029193597792048, guid: 9e95106956b6b73409695a04ddd56158,
+    type: 3}
+  _color: {r: 1, g: 1, b: 1, a: 0.29803923}
+  _puzzleMover: {fileID: 745840012}
 --- !u!1 &745840011
 GameObject:
   m_ObjectHideFlags: 0
@@ -528,7 +545,7 @@ MonoBehaviour:
   _spawnPosition:
     x: 5
     y: 2
-  _softDropFallTime: 0.3
+  _softDropFallTime: 0.2
 --- !u!4 &745840013
 Transform:
   m_ObjectHideFlags: 0
@@ -593,7 +610,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6c3fa46c0a3b3c47a762f14d377d2ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _updateTime: 0.7
+  _updateTime: 0.6
 --- !u!4 &898792677
 Transform:
   m_ObjectHideFlags: 0
@@ -639,8 +656,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _allPuzzles:
-  - {fileID: 11400000, guid: 81e93a8ca49678c47aefba94d12e4299, type: 2}
+  - {fileID: 11400000, guid: 60c6b7298437d504db48c7d1b2aa87fa, type: 2}
+  - {fileID: 11400000, guid: 8966f5a61104c2444bd4702627d2428a, type: 2}
+  - {fileID: 11400000, guid: 69d17c4bbaaffb141ad4455aaf77621d, type: 2}
   - {fileID: 11400000, guid: 7482c003092dea746860c247c83b8799, type: 2}
+  - {fileID: 11400000, guid: e2e4cb0b28ba18d4886443a074b881e4, type: 2}
+  - {fileID: 11400000, guid: 81e93a8ca49678c47aefba94d12e4299, type: 2}
+  - {fileID: 11400000, guid: 1f3d6c41f24c781428b08abbf3f821e0, type: 2}
 --- !u!4 &1526039436
 Transform:
   m_ObjectHideFlags: 0

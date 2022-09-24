@@ -1,11 +1,13 @@
-using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace gamer.tetris
 {
-    public class PuzzleMoverDisplayer : MonoBehaviour
+    public class GhostPuzzleDisplayer : MonoBehaviour
     {
         [SerializeField] GameObject _tileObject;
+        [SerializeField] Color _color;
         [SerializeField] PuzzleMoverComponent _puzzleMover;
 
         List<GameObject> _tiles = new List<GameObject>();
@@ -28,13 +30,16 @@ namespace gamer.tetris
         void DrawTiles()
         {
             if (_puzzleMover.PuzzleMover.ActivePuzzle == null) return;
+            var ghostPuzzleMover = _puzzleMover.PuzzleMover.Clone();
+            ghostPuzzleMover.HardDropDown();
+            var ghostPuzzle = ghostPuzzleMover.ActivePuzzle;
+
             var startPosition = new Vector3(
                 -(TetrisBoard.Width / 2f) + 0.5f, (TetrisBoard.Height / 2f) - 0.5f, 0f);
-            var activePuzzle = _puzzleMover.PuzzleMover.ActivePuzzle;
-            var puzzleOffsets = activePuzzle.GetTilesOffset();
-            for (int i = 0; i < activePuzzle.PuzzleData.TilesCount; i++)
+            var puzzleOffsets = ghostPuzzle.GetTilesOffset();
+            for (int i = 0; i < ghostPuzzle.PuzzleData.TilesCount; i++)
             {
-                var boardSpaceTilePosition = activePuzzle.Position + puzzleOffsets[i];
+                var boardSpaceTilePosition = ghostPuzzle.Position + puzzleOffsets[i];
                 var puzzle = Instantiate(_tileObject, transform);
                 puzzle.transform.localPosition =
                     new Vector3(
@@ -42,8 +47,7 @@ namespace gamer.tetris
                         startPosition.y - boardSpaceTilePosition.y,
                         0f);
                 var spriteRenderer = puzzle.GetComponent<SpriteRenderer>();
-                spriteRenderer.sprite = activePuzzle.PuzzleData.Tiles[i].Sprite;
-                spriteRenderer.color = activePuzzle.PuzzleData.Tiles[i].Color;
+                spriteRenderer.color = _color;
                 _tiles.Add(puzzle);
             }
         }

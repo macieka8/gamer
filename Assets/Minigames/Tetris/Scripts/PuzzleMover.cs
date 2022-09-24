@@ -163,5 +163,14 @@ namespace gamer.tetris
             }
             _isOnGround = !CanMoveDown();
         }
+
+        public PuzzleMover Clone()
+        {
+            var puzzleMover = new PuzzleMover(_tetrisBoard);
+            puzzleMover.SetActivePuzzle(
+                _activePuzzle.PuzzleData, _activePuzzle.Position, _activePuzzle.Rotation);
+            puzzleMover._isOnGround = _isOnGround;
+            return puzzleMover;
+        }
     }
 }

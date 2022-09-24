@@ -40,5 +40,10 @@ namespace gamer.tetris
             _rotation = (_rotation + 1) % _puzzleData.RotationCount;
             _tilesOffsets = _puzzleData.GetTileOffset(_rotation);
         }
+
+        public ActivePuzzle Clone()
+        {
+            return new ActivePuzzle(_puzzleData, _position, _rotation);
+        }
     }
 }

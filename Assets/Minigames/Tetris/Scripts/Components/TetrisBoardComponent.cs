@@ -11,8 +11,9 @@ namespace gamer.tetris
         public event System.Action OnValueSet;
         public IReadonlyTetrisBoard ReadonlyBoard => _tetrisBoard;
 
-        void Start()
+        void OnEnable()
         {
+            _tetrisBoard.Clear();
             for (int i = 0; i < _initalBoard.Length; i++)
             {
                 int x = i % TetrisBoard.Width;
@@ -23,7 +24,7 @@ namespace gamer.tetris
             OnValueSet += HandleValueSet;
         }
 
-        void OnDestroy()
+        void OnDisable()
         {
             OnValueSet -= HandleValueSet;
         }
@@ -49,25 +50,25 @@ namespace gamer.tetris
 
         public void SetValue(int x , int y, Tile value)
         {
-            _tetrisBoard.SetValue(x, y , value);
+            _tetrisBoard.SetValue(x, y , value, true);
             OnValueSet?.Invoke();
         }
 
         public void SetValue(int2 position, Tile value)
         {
-            _tetrisBoard.SetValue(position, value);
+            _tetrisBoard.SetValue(position, value, true);
             OnValueSet?.Invoke();
         }
 
         public void SetValue(IPuzzle puzzle, int2 position, int rotation)
         {
-            _tetrisBoard.SetValue(puzzle, position, rotation);
+            _tetrisBoard.SetValue(puzzle, position, rotation, true);
             OnValueSet?.Invoke();
         }
 
         public void SetValue(ActivePuzzle activePuzzle)
         {
-            _tetrisBoard.SetValue(activePuzzle.PuzzleData, activePuzzle.Position, activePuzzle.Rotation);
+            _tetrisBoard.SetValue(activePuzzle.PuzzleData, activePuzzle.Position, activePuzzle.Rotation, true);
             OnValueSet?.Invoke();
         }
 

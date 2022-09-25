@@ -1,7 +1,6 @@
 using UnityEngine;
-using gamer;
 
-namespace gamer.pong
+namespace gamer
 {
     public class GameController : MonoBehaviour
     {

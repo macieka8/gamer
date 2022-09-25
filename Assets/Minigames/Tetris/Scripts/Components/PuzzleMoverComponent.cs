@@ -143,6 +143,8 @@ namespace gamer.tetris
         void HandleRotateInput()
         {
             _puzzleMover.Rotate();
+            _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
+            _currentPlacingCountLimit++;
         }
 
         void HandleSoftDropInput(bool isSoftDropCanceled)

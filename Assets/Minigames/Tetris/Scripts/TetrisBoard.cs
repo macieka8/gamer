@@ -11,6 +11,8 @@ namespace gamer.tetris
 
         Tile[,] _board = new Tile[Height, Width];
 
+        public event System.Action OnTileOverridden;
+
         public bool IsPositionOnBoard(int2 position)
         {
             if (position.x < 0 || position.x >= Width) return false;
@@ -30,24 +32,26 @@ namespace gamer.tetris
             return GetValue(position.x, position.y);
         }
 
-        public void SetValue(int x , int y, Tile value)
+        public void SetValue(int x , int y, Tile value, bool checkIfOverridden = false)
         {
             if (x < 0 || x >= Width) throw new System.ArgumentOutOfRangeException(nameof(x));
             if (y < 0 || y >= Height) throw new System.ArgumentOutOfRangeException(nameof(y));
+            if (checkIfOverridden && !Tile.IsNullOrEmpty(_board[y,x]) && !Tile.IsNullOrEmpty(value))
+                OnTileOverridden?.Invoke();
             _board[y, x] = value;
         }
 
-        public void SetValue(int2 position, Tile value)
+        public void SetValue(int2 position, Tile value,bool checkIfOverridden = false)
         {
-            SetValue(position.x, position.y, value);
+            SetValue(position.x, position.y, value, checkIfOverridden);
         }
 
-        public void SetValue(IPuzzle puzzle, int2 position, int rotation)
+        public void SetValue(IPuzzle puzzle, int2 position, int rotation, bool checkIfOverridden = false)
         {
             var offsets = puzzle.GetTileOffset(rotation);
             for (int i = 0; i < puzzle.TilesCount; i++)
             {
-                SetValue(position + offsets[i], puzzle.Tiles[i]);
+                SetValue(position + offsets[i], puzzle.Tiles[i], checkIfOverridden);
             }
         }
 
@@ -94,6 +98,11 @@ namespace gamer.tetris
                     SetValue(x, i, GetValue(x, i - 1));
                 }
             }
+        }
+
+        public void Clear()
+        {
+            _board = new Tile[Height, Width];
         }
     }
 }

@@ -10,5 +10,6 @@ namespace gamer.tetris
         public Tile GetValue(int2 position);
         public bool FitsOnBoard(int2[] tilesOffsets, int2 position);
         public int[] GetFilledRows();
+        public event System.Action OnTileOverridden;
     }
 }

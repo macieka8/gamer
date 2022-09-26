@@ -563,14 +563,13 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 310855514}
-  _actions: {fileID: -944628639613478452, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
-    type: 3}
-  _actionMapName: Tetris
+  _actionMapReference: {fileID: 11400000, guid: 164752487dc81004cad975355578b4a5,
+    type: 2}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 402867033}
-        m_TargetAssemblyTypeName: gamer.pong.GameController, gamer
+        m_TargetAssemblyTypeName: gamer.GameController, gamer
         m_MethodName: StopMinigame
         m_Mode: 1
         m_Arguments:
@@ -1759,14 +1758,13 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 2133674137}
-  _actions: {fileID: -944628639613478452, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
-    type: 3}
-  _actionMapName: Tetris
+  _actionMapReference: {fileID: 11400000, guid: 164752487dc81004cad975355578b4a5,
+    type: 2}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 402867033}
-        m_TargetAssemblyTypeName: gamer.pong.GameController, gamer
+        m_TargetAssemblyTypeName: gamer.GameController, gamer
         m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:

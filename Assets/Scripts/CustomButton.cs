@@ -12,8 +12,8 @@ namespace gamer
     [AddComponentMenu("UI/CustomButton")]
     public class CustomButton : Selectable, IPointerClickHandler, ISubmitHandler
     {
-        [SerializeField] InputActionAsset _actions;
-        [SerializeField] string _actionMapName;
+        [SerializeField] InputActionMapReference _actionMapReference;
+
         [Serializable]
         /// <summary>
         /// Function definition for a button click event.
@@ -67,7 +67,7 @@ namespace gamer
         public override void OnMove(AxisEventData eventData)
         {
             // Prevent navigation when specifed InputActionMap is not used
-            var actionMap = _actions.FindActionMap(_actionMapName, true);
+            var actionMap = _actionMapReference.Value;
             if (actionMap.enabled)
             {
                 base.OnMove(eventData);

@@ -9,10 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea2cabc659fbe774ba0f073306086c05, type: 3}
-  m_Name: Player Input Controller
+  m_Script: {fileID: 11500000, guid: 574bf9f1a150be14da83c2555dbb30c4, type: 3}
+  m_Name: TetrisActionMap
   m_EditorClassIdentifier: 
   _actions: {fileID: -944628639613478452, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
     type: 3}
-  _defaultActionMap: MainGame
-  _globalActionMap: Global
+  _actionMap: 8ceaa63c-f1e1-45e5-b045-03b7ea372318

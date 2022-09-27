@@ -15,7 +15,7 @@ namespace gamer.pong
             _rigidbody = GetComponent<Rigidbody2D>();
         }
 
-        void Start()
+        void OnEnable()
         {
             _rigidbody.velocity = transform.InverseTransformDirection(Vector2.left);
         }

@@ -8,6 +8,12 @@ namespace gamer.pong
         [SerializeField] GoalComponent _goal;
         [SerializeField] TextMeshProUGUI _scoreText;
 
+
+        void OnEnable()
+        {
+            HandleGoalScored(0);
+        }
+
         void Start()
         {
             _goal.OnGoalScored += HandleGoalScored;

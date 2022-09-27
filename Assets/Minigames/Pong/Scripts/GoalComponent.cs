@@ -12,6 +12,11 @@ namespace gamer.pong
         public event System.Action<int> OnGoalScored;
         public UnityEvent OnGameWin;
 
+        void OnEnable()
+        {
+            _score = 0;
+        }
+
         void OnTriggerEnter2D(Collider2D collider)
         {
             if (collider.TryGetComponent<BallComponent>(out var _))

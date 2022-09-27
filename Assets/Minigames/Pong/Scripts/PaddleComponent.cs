@@ -22,6 +22,8 @@ namespace gamer.pong
 
         void OnEnable()
         {
+            transform.localPosition = Vector3.zero;
+
             _moveInputAction.action.performed += HandleMovementInput;
             _moveInputAction.action.canceled += HandleMovementInput;
         }

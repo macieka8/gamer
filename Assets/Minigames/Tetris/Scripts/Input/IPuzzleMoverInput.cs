@@ -8,5 +8,6 @@ namespace gamer.tetris
         public event Action<bool> OnSoftDropInput;
         public event Action OnHardDropInput;
         public event Action OnRotationInput;
+        public event Action OnSavePuzzleInput;
     }
 }

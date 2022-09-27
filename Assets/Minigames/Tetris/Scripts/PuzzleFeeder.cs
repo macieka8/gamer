@@ -7,6 +7,8 @@ namespace gamer.tetris
         Puzzle[] _puzzles;
         Puzzle _nextPuzzle;
 
+        IPuzzle _savedPuzzle;
+
         public PuzzleFeeder(Puzzle[] puzzles)
         {
             _puzzles = puzzles;
@@ -23,6 +25,20 @@ namespace gamer.tetris
         public Puzzle PeekNext()
         {
             return _nextPuzzle;
+        }
+
+        public IPuzzle SavePuzzle(IPuzzle puzzle)
+        {
+            var nextPuzzle = _savedPuzzle;
+            _savedPuzzle = puzzle;
+            if (nextPuzzle == null)
+                nextPuzzle = GetNext();
+            return nextPuzzle;
+        }
+
+        public IPuzzle GetSaved()
+        {
+            return _savedPuzzle;
         }
 
         Puzzle GetRandom()

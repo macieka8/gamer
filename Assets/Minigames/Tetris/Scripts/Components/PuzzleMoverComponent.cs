@@ -48,6 +48,7 @@ namespace gamer.tetris
             _input.OnRotationInput += HandleRotateInput;
             _input.OnSoftDropInput += HandleSoftDropInput;
             _input.OnHardDropInput += HandleHardDrop;
+            _input.OnSavePuzzleInput += HandlePuzzleSave;
         }
 
         void Start()
@@ -71,6 +72,7 @@ namespace gamer.tetris
             _input.OnRotationInput -= HandleRotateInput;
             _input.OnSoftDropInput -= HandleSoftDropInput;
             _input.OnHardDropInput -= HandleHardDrop;
+            _input.OnSavePuzzleInput -= HandlePuzzleSave;
         }
 
 
@@ -170,6 +172,12 @@ namespace gamer.tetris
             _puzzleMover.HardDropDown();
             _timeLeftToPlacePuzzle = 0f;
             UpdateSystemComponent.Instance.ForceUpdate();
+        }
+
+        void HandlePuzzleSave()
+        {
+            _puzzleMover.SetActivePuzzle(
+                _puzzleFeeder.SavePuzzle(_puzzleMover.ActivePuzzle.PuzzleData), _spawnPosition);
         }
     }
 }

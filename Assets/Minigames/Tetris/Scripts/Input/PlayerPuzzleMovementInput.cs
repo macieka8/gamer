@@ -12,11 +12,13 @@ namespace gamer.tetris
         [SerializeField] InputActionReference _rotateInputAction;
         [SerializeField] InputActionReference _softDropInputAction;
         [SerializeField] InputActionReference _hardDropInputAction;
+        [SerializeField] InputActionReference _savePuzzleInputAction;
 
         public event Action<float> OnMovementInput;
         public event Action<bool> OnSoftDropInput;
         public event Action OnHardDropInput;
         public event Action OnRotationInput;
+        public event Action OnSavePuzzleInput;
 
         void OnEnable()
         {
@@ -34,6 +36,9 @@ namespace gamer.tetris
 
             _hardDropInputAction.action.performed += HandleHardDrop;
             _hardDropInputAction.action.Enable();
+
+            _savePuzzleInputAction.action.performed += HandlePuzzleSave;
+            _savePuzzleInputAction.action.Enable();
         }
 
         void OnDisable()
@@ -45,6 +50,8 @@ namespace gamer.tetris
             _softDropInputAction.action.started -= HandleSoftDropInput;
             _softDropInputAction.action.canceled -= HandleSoftDropInput;
             _hardDropInputAction.action.performed -= HandleHardDrop;
+
+            _savePuzzleInputAction.action.performed -= HandlePuzzleSave;
         }
 
         void HandleHardDrop(InputAction.CallbackContext obj)
@@ -65,6 +72,11 @@ namespace gamer.tetris
         void HandleMoveInput(InputAction.CallbackContext obj)
         {
             OnMovementInput?.Invoke(obj.ReadValue<float>());
+        }
+
+        void HandlePuzzleSave(InputAction.CallbackContext ctx)
+        {
+            OnSavePuzzleInput?.Invoke();
         }
     }
 }

@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace gamer.tetris
 {
@@ -11,7 +10,7 @@ namespace gamer.tetris
 
         public event System.Action OnNextPuzzle;
 
-        void Awake()
+        void OnEnable()
         {
             _puzzleFeeder = new PuzzleFeeder(_allPuzzles);
         }
@@ -26,6 +25,18 @@ namespace gamer.tetris
         public Puzzle PeekNext()
         {
             return _puzzleFeeder.PeekNext();
+        }
+
+        public IPuzzle SavePuzzle(IPuzzle puzzle)
+        {
+            var nextPuzzle = _puzzleFeeder.SavePuzzle(puzzle);
+            OnNextPuzzle?.Invoke();
+            return nextPuzzle;
+        }
+
+        public IPuzzle GetSaved()
+        {
+            return _puzzleFeeder.GetSaved();
         }
     }
 }

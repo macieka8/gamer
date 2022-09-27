@@ -413,6 +413,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "SavePuzzle",
+                    "type": "Button",
+                    "id": "1cd8b011-3299-49c7-a659-a7cf810ddc07",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -450,9 +459,53 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "1D Axis",
+                    "id": "3de71796-93b0-4e76-9790-3688de1302d4",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "f1b1e3c4-498f-4616-a441-2b41b7264845",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "9e93def8-f250-41dd-b168-ee94cf570e7a",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
                     "id": "b171c1d9-9add-406c-a1b4-ded2c06e5034",
                     "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Rotate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1dd9e67e-b9c0-402d-bc10-5e71d0f6a256",
+                    "path": "<Keyboard>/upArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -473,12 +526,34 @@
                 },
                 {
                     "name": "",
+                    "id": "abe32bc5-e411-46b5-88c0-998cdafe9d30",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SoftDrop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "fb3241f5-0bb3-40cf-b596-3f519cb4373c",
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "HardDrop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9b640720-ded1-4473-b103-577bd24c5fe7",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "SavePuzzle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

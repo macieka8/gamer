@@ -481,6 +481,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3501d2a42249cc40a6e344789593629, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerInputController: {fileID: 11400000, guid: e8341bec109752c45a4ece5bf9eddbc3,
+    type: 2}
+  _owner: {fileID: 11400000, guid: 164752487dc81004cad975355578b4a5, type: 2}
   _defaultSelectedGameObject: {fileID: 2133674134}
 --- !u!1 &310855511
 GameObject:
@@ -535,9 +538,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 4
     m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
+    m_SelectOnUp: {fileID: 2133674139}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
@@ -1730,10 +1733,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 4
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
+    m_SelectOnDown: {fileID: 310855513}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1

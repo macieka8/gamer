@@ -12,6 +12,8 @@ namespace gamer
 
         InputActionMap _activeActionMap;
 
+        public event System.Action OnActionMapChanged;
+
         public InputActionMap ActiveActionMap => _activeActionMap;
         public string DefaultActionMap
         {
@@ -41,6 +43,8 @@ namespace gamer
             _activeActionMap.Disable();
             _activeActionMap = newActionMap;
             _activeActionMap.Enable();
+
+            OnActionMapChanged?.Invoke();
         }
 
         public void RestoreDefaultActionMap()

@@ -1,18 +1,16 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace gamer.maingame.movement
 {
     public class CharacterMovement : MonoBehaviour
     {
-        [SerializeField] InputActionReference _movementInput;
-        [SerializeField] InputActionReference _jumpInput;
         [SerializeField] float _speed = 5f;
         [SerializeField] float _jumpHeight = 5f;
         [SerializeField] float _groundDistance = 0.2f;
         [SerializeField] LayerMask _groundLayer;
         [SerializeField] Transform _groundChecker;
 
+        ICharacterMovementInput _input;
         Rigidbody _rigidbody;
         Camera _camera;
         public Camera Cam { get {
@@ -26,14 +24,14 @@ namespace gamer.maingame.movement
 
         void Awake()
         {
+            _input = GetComponent<ICharacterMovementInput>();
             _rigidbody = GetComponent<Rigidbody>();
         }
 
         void OnEnable()
         {
-            _movementInput.action.performed += HandleMovementInput;
-            _movementInput.action.canceled += HandleMovementInput;
-            _jumpInput.action.performed += HandleJumpInput;
+            _input.OnMovementInput += HandleMovementInput;
+            _input.OnJumpInput += HandleJumpInput;
         }
 
         void Update()
@@ -62,21 +60,19 @@ namespace gamer.maingame.movement
 
         void OnDisable()
         {
-            _movementInput.action.performed -= HandleMovementInput;
-            _movementInput.action.canceled -= HandleMovementInput;
-            _jumpInput.action.performed -= HandleJumpInput;
+            _input.OnMovementInput -= HandleMovementInput;
+            _input.OnJumpInput -= HandleJumpInput;
         }
 
-        void HandleMovementInput(InputAction.CallbackContext ctx)
+        void HandleMovementInput(Vector2 moveInput)
         {
-            var input = ctx.ReadValue<Vector2>();
-            _moveInput = new Vector3(input.x, 0f, input.y);
+            _moveInput = new Vector3(moveInput.x, 0f, moveInput.y);
             if (_moveInput.magnitude > 1.0f)
                 _moveInput.Normalize();
             _moveDir = _moveInput;
         }
 
-        void HandleJumpInput(InputAction.CallbackContext ctx)
+        void HandleJumpInput()
         {
             if (_isGrounded)
             {

@@ -352,12 +352,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 328ce309dcec4924fb953a560468a2d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _quitMinigameInputAction: {fileID: 4197197728306883864, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
-    type: 3}
-  _input: {fileID: 11400000, guid: e8341bec109752c45a4ece5bf9eddbc3, type: 2}
   _minigame: {fileID: 11400000, guid: 31c1b0c1fd1f453428074cb467109683, type: 2}
   _display: {fileID: 197765009}
-  _onFocusedCamera: {fileID: 1759016822}
+  _playerOnFocusedCamera: {fileID: 1759016822}
 --- !u!4 &263099255
 Transform:
   m_ObjectHideFlags: 0
@@ -860,12 +857,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 328ce309dcec4924fb953a560468a2d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _quitMinigameInputAction: {fileID: 4197197728306883864, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
-    type: 3}
-  _input: {fileID: 11400000, guid: e8341bec109752c45a4ece5bf9eddbc3, type: 2}
   _minigame: {fileID: 11400000, guid: 72ddd4b2b43496e498ad40e891ab2767, type: 2}
   _display: {fileID: 2103230817}
-  _onFocusedCamera: {fileID: 462707348}
+  _playerOnFocusedCamera: {fileID: 462707348}
 --- !u!65 &576221944
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1257,6 +1251,9 @@ GameObject:
   - component: {fileID: 1433899879}
   - component: {fileID: 1433899877}
   - component: {fileID: 1433899880}
+  - component: {fileID: 1433899881}
+  - component: {fileID: 1433899882}
+  - component: {fileID: 1433899883}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1343,10 +1340,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aead6ea709d5694494fc231ad9a055f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movementInput: {fileID: 8999466587618498869, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
-    type: 3}
-  _jumpInput: {fileID: 3734297941997294526, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
-    type: 3}
   _speed: 5
   _jumpHeight: 5
   _groundDistance: 0.2
@@ -1393,15 +1386,59 @@ MonoBehaviour:
   m_GameObject: {fileID: 1433899872}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a599829018b1a44eb36f6cfa7c1b089, type: 3}
+  m_Script: {fileID: 11500000, guid: 148c58dfce5640f4f9cc63274c29aeaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interactInputAction: {fileID: 7665865297546535645, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
-    type: 3}
   _raycastRange: 4
   _interactableLayer:
     serializedVersion: 2
     m_Bits: 128
+--- !u!114 &1433899881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433899872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60b192d7fa920ab4b9a5025ca1b6fffb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _movementInput: {fileID: 8999466587618498869, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
+    type: 3}
+  _jumpInput: {fileID: 3734297941997294526, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
+    type: 3}
+--- !u!114 &1433899882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433899872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1212e66756c9394b9d68a63b5a4efd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _quitMinigameInputAction: {fileID: 4197197728306883864, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
+    type: 3}
+  _interactInputAction: {fileID: 7665865297546535645, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
+    type: 3}
+--- !u!114 &1433899883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433899872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8b3b5191f055d846bbb1e4c7428cd8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerInputController: {fileID: 11400000, guid: e8341bec109752c45a4ece5bf9eddbc3,
+    type: 2}
 --- !u!1 &1573043582
 GameObject:
   m_ObjectHideFlags: 0

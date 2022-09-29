@@ -12,7 +12,7 @@ namespace gamer
         EventSystem _eventSystem;
         GameObject _selectedGameObject;
 
-        void Start()
+        void Awake()
         {
             _eventSystem = EventSystem.current;
         }
@@ -21,6 +21,7 @@ namespace gamer
         {
             _playerInputController.OnActionMapChanged += HandleActionMapChanged;
             EventSystem.current.SetSelectedGameObject(_defaultSelectedGameObject);
+            _selectedGameObject = EventSystem.current.currentSelectedGameObject;
         }
 
         void OnDisable()

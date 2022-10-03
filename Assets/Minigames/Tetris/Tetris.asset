@@ -17,3 +17,4 @@ MonoBehaviour:
   _minigameTexture: {fileID: 8400000, guid: c23779ac59e8a18469bf164bb829aab5, type: 2}
   _minigameMaterial: {fileID: 2100000, guid: 5437d26233ab90843a7a09a539ee0a1f, type: 2}
   _input: {fileID: 11400000, guid: e8341bec109752c45a4ece5bf9eddbc3, type: 2}
+  _maxPlayerCount: 1

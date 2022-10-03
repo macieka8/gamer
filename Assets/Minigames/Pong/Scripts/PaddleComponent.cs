@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace gamer.pong
 {
@@ -7,8 +6,7 @@ namespace gamer.pong
     {
         [SerializeField] float _speed;
         [SerializeField] float _maxReflectAngle;
-        [SerializeField] InputActionReference _moveInputAction;
-
+        FloatInputSender _moveInput;
         Rigidbody2D _rigidbody;
 
         Vector2 _moveDirection = Vector2.zero;
@@ -16,6 +14,7 @@ namespace gamer.pong
 
         void Awake()
         {
+            _moveInput = GetComponent<FloatInputSender>();
             _rigidbody = GetComponent<Rigidbody2D>();
             _length = Mathf.Abs(transform.TransformVector(GetComponent<BoxCollider2D>().size).y);
         }
@@ -24,8 +23,7 @@ namespace gamer.pong
         {
             transform.localPosition = Vector3.zero;
 
-            _moveInputAction.action.performed += HandleMovementInput;
-            _moveInputAction.action.canceled += HandleMovementInput;
+            _moveInput.OnInput += HandleMovementInput;
         }
 
         void FixedUpdate()
@@ -46,13 +44,12 @@ namespace gamer.pong
 
         void OnDisable()
         {
-            _moveInputAction.action.performed -= HandleMovementInput;
-            _moveInputAction.action.canceled -= HandleMovementInput;
+            _moveInput.OnInput -= HandleMovementInput;
         }
 
-        void HandleMovementInput(InputAction.CallbackContext ctx)
+        void HandleMovementInput(float direction)
         {
-            _moveDirection = new Vector2(0f, ctx.ReadValue<float>());
+            _moveDirection = new Vector2(0f, direction);
         }
     }
 }

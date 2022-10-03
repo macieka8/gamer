@@ -1,0 +1,18 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+using System;
+
+namespace gamer
+{
+    public class InputSender<T> : MonoBehaviour, IInputSender, IInputReceiver<T>
+    {
+        [SerializeField] InputActionReference _action;
+        public event IInputReceiver<T>.OnInputAction OnInput;
+        public string InputName => _action.action.name;
+
+        public void SendInput(object input)
+        {
+            OnInput?.Invoke((T)input);
+        }
+    }
+}

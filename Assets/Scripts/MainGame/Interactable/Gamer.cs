@@ -7,22 +7,23 @@ namespace gamer.maingame.interactable
         [SerializeField] float _raycastRange = 1f;
         [SerializeField] LayerMask _interactableLayer;
 
-        IGamerInput _gamerInput;
+        IInputMapController _gamerInput;
         IInteractorInput _interactorInput;
         Camera _camera;
+        IInputSenderMap _currentlyUsedInputSenderMap;
 
         public Camera Cam { get {
             if (_camera == null) _camera = Camera.main;
             return _camera;
         } }
 
-        GameMachine _foundInteractable;
+        IGameMachine _foundGameMachine;
         bool _isFocusedOnInteractabe;
 
         void Awake()
         {
             _interactorInput = GetComponent<IInteractorInput>();
-            _gamerInput = GetComponent<IGamerInput>();
+            _gamerInput = GetComponent<IInputMapController>();
         }
 
         void OnEnable()
@@ -33,13 +34,13 @@ namespace gamer.maingame.interactable
 
         void Update()
         {
-            if (_foundInteractable == null)
+            if (_foundGameMachine == null)
             {
                 FindInteractable();
             }
             else if (!IsStillFocusedOnInteractable())
             {
-                _foundInteractable = null;
+                _foundGameMachine = null;
             }
         }
 
@@ -51,12 +52,13 @@ namespace gamer.maingame.interactable
 
         void HandleInteractInput()
         {
-            if (_foundInteractable.State == GameMachineState.On)
+            if (_foundGameMachine == null) return;
+            if (_foundGameMachine.State == GameMachineState.On)
             {
                 FocusOnInteractable();
             }
 
-            _foundInteractable?.Interact();
+            _foundGameMachine?.Interact();
         }
 
         void HandleMinigameUnfocusInput()
@@ -69,15 +71,22 @@ namespace gamer.maingame.interactable
 
         void FocusOnInteractable()
         {
+            if (_foundGameMachine.TryConnectGamer(out var inputSenderMap))
+            {
                 _isFocusedOnInteractabe = true;
-                _foundInteractable.PlayerOnFocusedCamera.SetActive(true);
-                _gamerInput.SetActiveGamerState(_foundInteractable.Minigame.InputActionMapName);
+                _currentlyUsedInputSenderMap = inputSenderMap;
+                _foundGameMachine.PlayerOnFocusedCamera.SetActive(true);
+                _gamerInput.SetActiveGamerState(inputSenderMap);
+            }
         }
 
         void UnfocusOnInteractable()
         {
-                _gamerInput.RestoreDefaultGamerState();
-                _foundInteractable.PlayerOnFocusedCamera.SetActive(false);
+            _foundGameMachine.DisconnectGamer(_currentlyUsedInputSenderMap);
+            _currentlyUsedInputSenderMap = null;
+            _foundGameMachine.PlayerOnFocusedCamera.SetActive(false);
+            _gamerInput.RestoreDefaultGamerState();
+            _isFocusedOnInteractabe = false;
         }
 
         void FindInteractable()
@@ -90,7 +99,7 @@ namespace gamer.maingame.interactable
                 {
                     if (hit.collider.TryGetComponent<GameMachine>(out var foundInteractable))
                     {
-                        _foundInteractable = foundInteractable;
+                        _foundGameMachine = foundInteractable;
                     }
                 }
         }
@@ -103,9 +112,9 @@ namespace gamer.maingame.interactable
                     _raycastRange,
                     _interactableLayer))
                 {
-                    if (hit.collider.TryGetComponent<GameMachine>(out var foundInteractable))
+                    if (hit.collider.TryGetComponent<IGameMachine>(out var foundInteractable))
                     {
-                        return foundInteractable == _foundInteractable;
+                        return foundInteractable == _foundGameMachine;
                     }
                     else
                     {
@@ -117,7 +126,7 @@ namespace gamer.maingame.interactable
 
         void OnDrawGizmosSelected()
         {
-            Gizmos.color = (_foundInteractable == null) ? Color.red : Color.green;
+            Gizmos.color = (_foundGameMachine == null) ? Color.red : Color.green;
             Gizmos.DrawLine(
                 Cam.transform.position,
                 Cam.transform.position + (Cam.transform.TransformDirection(Vector3.forward) * _raycastRange));

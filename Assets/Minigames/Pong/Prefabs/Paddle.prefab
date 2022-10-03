@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: -9023586745498039143}
   - component: {fileID: 2709904440932318866}
   - component: {fileID: -1029117954486265252}
+  - component: {fileID: 3726532918448724034}
   m_Layer: 0
   m_Name: Paddle
   m_TagString: Untagged
@@ -149,5 +150,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 6
   _maxReflectAngle: 60
-  _moveInputAction: {fileID: -2144695769790323847, guid: c9ca65478c571bd438834e4d42fc36fc,
+--- !u!114 &3726532918448724034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2776130301631234170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44be3b37c6e5a604f86fdb03fd1b3c62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _action: {fileID: -1665333013796365404, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
     type: 3}

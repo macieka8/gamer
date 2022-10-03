@@ -20,8 +20,16 @@ namespace gamer
         void OnEnable()
         {
             _playerInputController.OnActionMapChanged += HandleActionMapChanged;
-            EventSystem.current.SetSelectedGameObject(_defaultSelectedGameObject);
-            _selectedGameObject = EventSystem.current.currentSelectedGameObject;
+
+            if (_playerInputController.ActiveActionMap == _owner.Value)
+            {
+                EventSystem.current.SetSelectedGameObject(_defaultSelectedGameObject);
+                _selectedGameObject = EventSystem.current.currentSelectedGameObject;
+            }
+            else
+            {
+                _selectedGameObject = _defaultSelectedGameObject;
+            }
         }
 
         void OnDisable()

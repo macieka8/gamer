@@ -26,7 +26,11 @@ namespace gamer.tetris
         [SerializeField] float _softDropFallTime;
 
         PuzzleMover _puzzleMover;
-        IPuzzleMoverInput _input;
+        [SerializeField] FloatInputSender _movementInput;
+        [SerializeField] EmptyInputSender _rotationInput;
+        [SerializeField] BoolInputSender _softDropInput;
+        [SerializeField] EmptyInputSender _hardDropInput;
+        [SerializeField] EmptyInputSender _savePuzzleInput;
 
         DropState _dropState;
         float _timeLeftToMove;
@@ -36,19 +40,14 @@ namespace gamer.tetris
 
         public PuzzleMover PuzzleMover => _puzzleMover;
 
-        void Awake()
-        {
-            _input = GetComponent<IPuzzleMoverInput>();
-        }
-
         void OnEnable()
         {
             UpdateSystemComponent.Instance.OnUpdate += HandleUpdate;
-            _input.OnMovementInput += HandleMoveInput;
-            _input.OnRotationInput += HandleRotateInput;
-            _input.OnSoftDropInput += HandleSoftDropInput;
-            _input.OnHardDropInput += HandleHardDrop;
-            _input.OnSavePuzzleInput += HandlePuzzleSave;
+            _movementInput.OnInput += HandleMoveInput;
+            _rotationInput.OnInput += HandleRotateInput;
+            _softDropInput.OnInput += HandleSoftDropInput;
+            _hardDropInput.OnInput += HandleHardDrop;
+            _savePuzzleInput.OnInput += HandlePuzzleSave;
         }
 
         void Start()
@@ -68,11 +67,11 @@ namespace gamer.tetris
         void OnDisable()
         {
             UpdateSystemComponent.Instance.OnUpdate -= HandleUpdate;
-            _input.OnMovementInput -= HandleMoveInput;
-            _input.OnRotationInput -= HandleRotateInput;
-            _input.OnSoftDropInput -= HandleSoftDropInput;
-            _input.OnHardDropInput -= HandleHardDrop;
-            _input.OnSavePuzzleInput -= HandlePuzzleSave;
+            _movementInput.OnInput -= HandleMoveInput;
+            _rotationInput.OnInput -= HandleRotateInput;
+            _softDropInput.OnInput -= HandleSoftDropInput;
+            _hardDropInput.OnInput -= HandleHardDrop;
+            _savePuzzleInput.OnInput -= HandlePuzzleSave;
         }
 
 
@@ -142,7 +141,7 @@ namespace gamer.tetris
             Move(_direction);
         }
 
-        void HandleRotateInput()
+        void HandleRotateInput(object obj)
         {
             _puzzleMover.Rotate();
             _timeLeftToPlacePuzzle = _timeBeforePlacingPuzzle;
@@ -167,14 +166,14 @@ namespace gamer.tetris
             }
         }
 
-        void HandleHardDrop()
+        void HandleHardDrop(object obj)
         {
             _puzzleMover.HardDropDown();
             _timeLeftToPlacePuzzle = 0f;
             UpdateSystemComponent.Instance.ForceUpdate();
         }
 
-        void HandlePuzzleSave()
+        void HandlePuzzleSave(object obj)
         {
             _puzzleMover.SetActivePuzzle(
                 _puzzleFeeder.SavePuzzle(_puzzleMover.ActivePuzzle.PuzzleData), _spawnPosition);

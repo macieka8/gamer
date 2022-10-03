@@ -1,44 +1,37 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Unity.Mathematics;
-using System;
+using System.Collections.Generic;
 
 namespace gamer.tetris
 {
-    public class PlayerPuzzleMovementInput : MonoBehaviour, IPuzzleMoverInput
+    public class PlayerTetrisGamerInputBinder : GamerInputBinder
     {
-        [Header("Player Inputs")]
+        [SerializeField] InputActionMapReference _tetrisActionMap;
+        [Header("Inputs")]
         [SerializeField] InputActionReference _moveInputAction;
         [SerializeField] InputActionReference _rotateInputAction;
         [SerializeField] InputActionReference _softDropInputAction;
         [SerializeField] InputActionReference _hardDropInputAction;
         [SerializeField] InputActionReference _savePuzzleInputAction;
 
-        public event Action<float> OnMovementInput;
-        public event Action<bool> OnSoftDropInput;
-        public event Action OnHardDropInput;
-        public event Action OnRotationInput;
-        public event Action OnSavePuzzleInput;
+        IReadOnlyDictionary<string, IInputSender> _actionNameToSender;
+
+        public override string ActionMapName => _tetrisActionMap.Value.name;
 
         void OnEnable()
         {
             //todo: remove enable
             _moveInputAction.action.performed += HandleMoveInput;
             _moveInputAction.action.canceled += HandleMoveInput;
-            _moveInputAction.action.Enable();
 
             _rotateInputAction.action.performed += HandleRotateInput;
-            _rotateInputAction.action.Enable();
 
             _softDropInputAction.action.started += HandleSoftDropInput;
             _softDropInputAction.action.canceled += HandleSoftDropInput;
-            _softDropInputAction.action.Enable();
 
             _hardDropInputAction.action.performed += HandleHardDrop;
-            _hardDropInputAction.action.Enable();
 
             _savePuzzleInputAction.action.performed += HandlePuzzleSave;
-            _savePuzzleInputAction.action.Enable();
         }
 
         void OnDisable()
@@ -56,27 +49,43 @@ namespace gamer.tetris
 
         void HandleHardDrop(InputAction.CallbackContext obj)
         {
-            OnHardDropInput?.Invoke();
+            _actionNameToSender[_hardDropInputAction.action.name]
+                .SendInput(null);
         }
 
         void HandleSoftDropInput(InputAction.CallbackContext obj)
         {
-            OnSoftDropInput?.Invoke(obj.canceled);
+            _actionNameToSender[_softDropInputAction.action.name]
+                .SendInput(obj.canceled);
         }
 
         void HandleRotateInput(InputAction.CallbackContext obj)
         {
-            OnRotationInput?.Invoke();
+            _actionNameToSender[_rotateInputAction.action.name]
+                .SendInput(null);
         }
 
         void HandleMoveInput(InputAction.CallbackContext obj)
         {
-            OnMovementInput?.Invoke(obj.ReadValue<float>());
+            _actionNameToSender[_moveInputAction.action.name]
+                .SendInput(obj.ReadValue<float>());
         }
 
         void HandlePuzzleSave(InputAction.CallbackContext ctx)
         {
-            OnSavePuzzleInput?.Invoke();
+            _actionNameToSender[_savePuzzleInputAction.action.name]
+                .SendInput(null);
+        }
+
+        public override void Bind(IInputSenderMap inputSenderMap)
+        {
+            if (_tetrisActionMap.Value.name != inputSenderMap.GetActionMapName) return;
+            _actionNameToSender = inputSenderMap.Map;
+        }
+
+        public override void Unbind()
+        {
+            _actionNameToSender = null;
         }
     }
 }

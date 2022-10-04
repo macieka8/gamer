@@ -1,0 +1,18 @@
+{
+    "name": "gamer.maingame.bot",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f04ecb28e510f3d40a4b56fc68bf2c08",
+        "GUID:ff8b170db66b7ef4b837a3214c295700",
+        "GUID:f0ff7f66f88c5664d8f5ff212d9aab0d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

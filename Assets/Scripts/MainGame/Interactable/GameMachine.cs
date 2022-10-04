@@ -8,28 +8,26 @@ namespace gamer.maingame.interactable
         On
     }
 
-    public interface IGameMachine : IInteractable
-    {
-        public GameMachineState State { get; }
-        public Minigame Minigame { get; }
-        public GameObject PlayerOnFocusedCamera { get; }
-
-        public bool TryConnectGamer(out IInputSenderMap inputSenderMap);
-        public void DisconnectGamer(IInputSenderMap inputSenderMap);
-    }
-
     public class GameMachine : MonoBehaviour, IGameMachine
     {
         [SerializeField] Minigame _minigame;
         [SerializeField] Renderer _display;
         [SerializeField] GameObject _playerOnFocusedCamera;
 
+        Transform _transform;
         GameMachineState _state = GameMachineState.Off;
         int _currentGamersCount = 0;
 
         public GameMachineState State => _state;
         public Minigame Minigame => _minigame;
         public GameObject PlayerOnFocusedCamera => _playerOnFocusedCamera;
+
+        public Transform Transform => _transform;
+
+        void Awake()
+        {
+            _transform = transform;
+        }
 
         void Start()
         {
@@ -59,7 +57,7 @@ namespace gamer.maingame.interactable
         public bool TryConnectGamer(out IInputSenderMap inputSenderMap)
         {
             inputSenderMap = null;
-            if (_currentGamersCount < _minigame.MaxPlayerCount)
+            if (_currentGamersCount < _minigame.MaxPlayerCount && _minigame.InputSenderMapManager != null)
             {
                 _currentGamersCount++;
                 inputSenderMap = _minigame.InputSenderMapManager.ClaimInputSenderMap();

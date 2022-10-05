@@ -46,12 +46,14 @@ namespace gamer.maingame.interactable
             {
                 _minigame.StartMinigame();
                 _state = GameMachineState.On;
+                _currentGamersCount = 0;
             }
         }
 
         void HandleMachineTurnedOff()
         {
             _state = GameMachineState.Off;
+            _currentGamersCount = 0;
         }
 
         public bool TryConnectGamer(out IInputSenderMap inputSenderMap)
@@ -68,6 +70,7 @@ namespace gamer.maingame.interactable
 
         public void DisconnectGamer(IInputSenderMap inputSenderMap)
         {
+            if (_minigame.InputSenderMapManager == null) return;
             _minigame.InputSenderMapManager.ReleaseInputSenderMap(inputSenderMap);
             _currentGamersCount--;
         }

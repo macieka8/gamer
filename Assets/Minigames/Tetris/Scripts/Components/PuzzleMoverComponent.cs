@@ -173,8 +173,9 @@ namespace gamer.tetris
 
         void HandlePuzzleSave(object obj)
         {
-            _puzzleMover.SetActivePuzzle(
-                _puzzleFeeder.SavePuzzle(_puzzleMover.ActivePuzzle.PuzzleData), _spawnPosition);
+            var puzzle = _puzzleFeeder.SavePuzzle(_puzzleMover.ActivePuzzle.PuzzleData);
+            if (puzzle != null)
+                _puzzleMover.SetActivePuzzle(puzzle, _spawnPosition);
         }
     }
 }

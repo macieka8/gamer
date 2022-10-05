@@ -8,6 +8,9 @@ namespace gamer.tetris
         Puzzle _nextPuzzle;
 
         IPuzzle _savedPuzzle;
+        bool _canSave = true;
+
+        public bool CanSave => _canSave;
 
         public PuzzleFeeder(Puzzle[] puzzles)
         {
@@ -17,6 +20,7 @@ namespace gamer.tetris
 
         public Puzzle GetNext()
         {
+            _canSave = true;
             var current = _nextPuzzle;
             _nextPuzzle = GetRandom();
             return current;
@@ -29,6 +33,7 @@ namespace gamer.tetris
 
         public IPuzzle SavePuzzle(IPuzzle puzzle)
         {
+            _canSave = false;
             var nextPuzzle = _savedPuzzle;
             _savedPuzzle = puzzle;
             if (nextPuzzle == null)

@@ -29,6 +29,7 @@ namespace gamer.tetris
 
         public IPuzzle SavePuzzle(IPuzzle puzzle)
         {
+            if (!_puzzleFeeder.CanSave) return null;
             var nextPuzzle = _puzzleFeeder.SavePuzzle(puzzle);
             OnNextPuzzle?.Invoke();
             return nextPuzzle;

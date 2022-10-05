@@ -59,8 +59,8 @@ namespace gamer.tetris
 
         void Update()
         {
-            UpdateMove();
             UpdatePuzzlePlacing();
+            UpdateMove();
         }
 
         void OnDisable()

@@ -161,7 +161,7 @@ namespace gamer.tetris
             {
                 _activePuzzle.Position += new int2(0, 1);
             }
-            _isOnGround = !CanMoveDown();
+            _isOnGround = true;
         }
 
         public PuzzleMover Clone()

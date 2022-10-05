@@ -10,11 +10,9 @@ namespace gamer.tetris
     }
     public class PuzzleMoverComponent : MonoBehaviour
     {
-
         [Header("References")]
         [SerializeField] TetrisBoardComponent _tetrisBoard;
         [SerializeField] PuzzleFeederComponent _puzzleFeeder;
-
 
         [Header("Puzzle Movement Settings")]
         [SerializeField] float _moveTime;
@@ -26,11 +24,7 @@ namespace gamer.tetris
         [SerializeField] float _softDropFallTime;
 
         PuzzleMover _puzzleMover;
-        [SerializeField] FloatInputSender _movementInput;
-        [SerializeField] EmptyInputSender _rotationInput;
-        [SerializeField] BoolInputSender _softDropInput;
-        [SerializeField] EmptyInputSender _hardDropInput;
-        [SerializeField] EmptyInputSender _savePuzzleInput;
+        IPuzzleMoverInput _input;
 
         DropState _dropState;
         float _timeLeftToMove;
@@ -40,14 +34,19 @@ namespace gamer.tetris
 
         public PuzzleMover PuzzleMover => _puzzleMover;
 
+        void Awake()
+        {
+            _input = GetComponent<IPuzzleMoverInput>();
+        }
+
         void OnEnable()
         {
             UpdateSystemComponent.Instance.OnUpdate += HandleUpdate;
-            _movementInput.OnInput += HandleMoveInput;
-            _rotationInput.OnInput += HandleRotateInput;
-            _softDropInput.OnInput += HandleSoftDropInput;
-            _hardDropInput.OnInput += HandleHardDrop;
-            _savePuzzleInput.OnInput += HandlePuzzleSave;
+            _input.OnMovementInput += HandleMoveInput;
+            _input.OnRotationInput += HandleRotateInput;
+            _input.OnSoftDropInput += HandleSoftDropInput;
+            _input.OnHardDropInput += HandleHardDrop;
+            _input.OnSavePuzzleInput += HandlePuzzleSave;
         }
 
         void Start()
@@ -67,13 +66,12 @@ namespace gamer.tetris
         void OnDisable()
         {
             UpdateSystemComponent.Instance.OnUpdate -= HandleUpdate;
-            _movementInput.OnInput -= HandleMoveInput;
-            _rotationInput.OnInput -= HandleRotateInput;
-            _softDropInput.OnInput -= HandleSoftDropInput;
-            _hardDropInput.OnInput -= HandleHardDrop;
-            _savePuzzleInput.OnInput -= HandlePuzzleSave;
+            _input.OnMovementInput -= HandleMoveInput;
+            _input.OnRotationInput -= HandleRotateInput;
+            _input.OnSoftDropInput -= HandleSoftDropInput;
+            _input.OnHardDropInput -= HandleHardDrop;
+            _input.OnSavePuzzleInput -= HandlePuzzleSave;
         }
-
 
         void UpdateMove()
         {

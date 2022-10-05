@@ -57,7 +57,7 @@ namespace gamer.maingame.interactable
 
         void FocusOnInteractable()
         {
-            if (_foundGameMachine.TryConnectGamer(out var inputSenderMap))
+            if (_foundGameMachine.TryConnectGamer(this, out var inputSenderMap))
             {
                 _currentlyUsedInputSenderMap = inputSenderMap;
                 _inputMapController.SetActiveGamerState(inputSenderMap);
@@ -69,7 +69,7 @@ namespace gamer.maingame.interactable
 
         void UnfocusOnInteractable()
         {
-            _foundGameMachine.DisconnectGamer(_currentlyUsedInputSenderMap);
+            _foundGameMachine.DisconnectGamer(this);
             _currentlyUsedInputSenderMap = null;
             _inputMapController.RestoreDefaultGamerState();
             if (_isPlayer)

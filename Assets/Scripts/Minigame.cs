@@ -32,11 +32,10 @@ namespace gamer
 
         public void StopMinigame()
         {
+            OnMinigameStopped?.Invoke();
             SceneManager.UnloadSceneAsync(_sceneName);
             if (_input.ActiveActionMap.name == _inputActionMapName)
                 _input.RestoreDefaultActionMap();
-
-            OnMinigameStopped?.Invoke();
         }
 
         public void RegisterSenderMap(IInputSenderMapManager senderMap)

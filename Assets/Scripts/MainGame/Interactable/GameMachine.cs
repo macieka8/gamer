@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace gamer.maingame.interactable
@@ -10,13 +11,19 @@ namespace gamer.maingame.interactable
 
     public class GameMachine : MonoBehaviour, IGameMachine
     {
+        class GamerToInputEntry
+        {
+            public Gamer Gamer;
+            public IInputSenderMap Map;
+        }
+
         [SerializeField] Minigame _minigame;
         [SerializeField] Renderer _display;
         [SerializeField] GameObject _playerOnFocusedCamera;
 
         Transform _transform;
         GameMachineState _state = GameMachineState.Off;
-        int _currentGamersCount = 0;
+        List<GamerToInputEntry> _connectedGamers = new List<GamerToInputEntry>();
 
         public GameMachineState State => _state;
         public Minigame Minigame => _minigame;
@@ -46,33 +53,36 @@ namespace gamer.maingame.interactable
             {
                 _minigame.StartMinigame();
                 _state = GameMachineState.On;
-                _currentGamersCount = 0;
             }
         }
 
         void HandleMachineTurnedOff()
         {
             _state = GameMachineState.Off;
-            _currentGamersCount = 0;
+            for (int i = _connectedGamers.Count - 1; i >= 0; i--)
+            {
+                DisconnectGamer(_connectedGamers[i].Gamer);
+            }
         }
 
-        public bool TryConnectGamer(out IInputSenderMap inputSenderMap)
+        public bool TryConnectGamer(Gamer gamer, out IInputSenderMap inputSenderMap)
         {
             inputSenderMap = null;
-            if (_currentGamersCount < _minigame.MaxPlayerCount && _minigame.InputSenderMapManager != null)
+            if (_connectedGamers.Count < _minigame.MaxPlayerCount && _minigame.InputSenderMapManager != null)
             {
-                _currentGamersCount++;
                 inputSenderMap = _minigame.InputSenderMapManager.ClaimInputSenderMap();
+                _connectedGamers.Add(new GamerToInputEntry {Gamer = gamer, Map = inputSenderMap});
                 return true;
             }
             return false;
         }
 
-        public void DisconnectGamer(IInputSenderMap inputSenderMap)
+        public void DisconnectGamer(Gamer gamer)
         {
-            if (_minigame.InputSenderMapManager == null) return;
-            _minigame.InputSenderMapManager.ReleaseInputSenderMap(inputSenderMap);
-            _currentGamersCount--;
+            var entry = _connectedGamers.Find(entry => entry.Gamer == gamer);
+            if (entry == null) return;
+            _minigame.InputSenderMapManager.ReleaseInputSenderMap(entry.Map);
+            _connectedGamers.Remove(entry);
         }
     }
 }

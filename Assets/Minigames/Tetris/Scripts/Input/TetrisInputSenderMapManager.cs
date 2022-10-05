@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
 namespace gamer.tetris
@@ -8,24 +7,15 @@ namespace gamer.tetris
     {
         [SerializeField] InputActionMapReference _tetrisActionMap;
         [SerializeField] Minigame _minigame;
-        [SerializeField] FloatInputSender _moveSender;
-        [SerializeField] EmptyInputSender _rotateSender;
-        [SerializeField] BoolInputSender _softDropSender;
-        [SerializeField] EmptyInputSender _hardDropSender;
-        [SerializeField] EmptyInputSender _savePuzzleSender;
+        [SerializeField] PuzzleMoverInputSenders _puzzleMoverInputSenders;
 
         Queue<IInputSenderMap> _unusedInputMaps = new Queue<IInputSenderMap>();
 
         void Start()
         {
-            var sendersDict = new Dictionary<string, IInputSender>();
-            sendersDict.Add(_moveSender.InputName, _moveSender);
-            sendersDict.Add(_rotateSender.InputName, _rotateSender);
-            sendersDict.Add(_softDropSender.InputName, _softDropSender);
-            sendersDict.Add(_hardDropSender.InputName, _hardDropSender);
-            sendersDict.Add(_savePuzzleSender.InputName, _savePuzzleSender);
-
-            _unusedInputMaps.Enqueue(new InputSenderMap(_tetrisActionMap.Value.name, sendersDict));
+            var map = new InputSenderMap(
+                _tetrisActionMap.Value.name, _puzzleMoverInputSenders.ToInputSenderDictionary());
+            _unusedInputMaps.Enqueue(map);
 
             _minigame.RegisterSenderMap(this);
         }

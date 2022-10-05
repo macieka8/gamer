@@ -4,10 +4,10 @@ namespace gamer.tetris
 {
     public interface IPuzzleMoverInput
     {
-        public event Action<float> OnMovementInput;
-        public event Action<bool> OnSoftDropInput;
-        public event Action OnHardDropInput;
-        public event Action OnRotationInput;
-        public event Action OnSavePuzzleInput;
+        public event IInputReceiver<float>.OnInputAction OnMovementInput;
+        public event IInputReceiver.OnInputAction OnRotationInput;
+        public event IInputReceiver<bool>.OnInputAction OnSoftDropInput;
+        public event IInputReceiver.OnInputAction OnHardDropInput;
+        public event IInputReceiver.OnInputAction OnSavePuzzleInput;
     }
 }

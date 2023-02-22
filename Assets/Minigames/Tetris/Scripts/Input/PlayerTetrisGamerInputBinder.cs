@@ -20,7 +20,6 @@ namespace gamer.tetris
 
         void OnEnable()
         {
-            //todo: remove enable
             _moveInputAction.action.performed += HandleMoveInput;
             _moveInputAction.action.canceled += HandleMoveInput;
 

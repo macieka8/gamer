@@ -69,12 +69,14 @@ namespace gamer.tetris
         {
             if (!_isInitialized) InitSenders();
 
-            var sendersDict = new Dictionary<string, IInputSender>();
-            sendersDict.Add(_moveSender.InputName, _moveSender);
-            sendersDict.Add(_rotateSender.InputName, _rotateSender);
-            sendersDict.Add(_softDropSender.InputName, _softDropSender);
-            sendersDict.Add(_hardDropSender.InputName, _hardDropSender);
-            sendersDict.Add(_savePuzzleSender.InputName, _savePuzzleSender);
+            var sendersDict = new Dictionary<string, IInputSender>
+            {
+                { _moveSender.InputName, _moveSender },
+                { _rotateSender.InputName, _rotateSender },
+                { _softDropSender.InputName, _softDropSender },
+                { _hardDropSender.InputName, _hardDropSender },
+                { _savePuzzleSender.InputName, _savePuzzleSender }
+            };
 
             return sendersDict;
         }

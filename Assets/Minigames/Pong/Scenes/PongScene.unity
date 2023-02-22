@@ -505,7 +505,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420030}
   m_Layer: 0
-  m_Name: Main Camera
+  m_Name: Pong Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -577,7 +577,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 8400000, guid: 883c34926fdd22d49a18004689fff30c, type: 2}
+  m_TargetTexture: {fileID: 8400000, guid: 587ed2bb2afa27a48bcb66a4994472f5, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 0
   m_HDR: 1

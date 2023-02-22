@@ -20,10 +20,11 @@ namespace gamer.maingame.interactable
         [SerializeField] Minigame _minigame;
         [SerializeField] Renderer _display;
         [SerializeField] GameObject _playerOnFocusedCamera;
-
+        
         Transform _transform;
         GameMachineState _state = GameMachineState.Off;
         List<GamerToInputEntry> _connectedGamers = new List<GamerToInputEntry>();
+        Material _turnedOffMaterial;
 
         public GameMachineState State => _state;
         public Minigame Minigame => _minigame;
@@ -34,11 +35,11 @@ namespace gamer.maingame.interactable
         void Awake()
         {
             _transform = transform;
+            _turnedOffMaterial = _display.material;
         }
 
         void Start()
         {
-            _display.material = _minigame.MinigameMaterial;
             _minigame.OnMinigameStopped += HandleMachineTurnedOff;
         }
 
@@ -51,6 +52,7 @@ namespace gamer.maingame.interactable
         {
             if (_state == GameMachineState.Off)
             {
+                _display.material = _minigame.MinigameMaterial;
                 _minigame.StartMinigame();
                 _state = GameMachineState.On;
             }
@@ -63,6 +65,8 @@ namespace gamer.maingame.interactable
             {
                 DisconnectGamer(_connectedGamers[i].Gamer);
             }
+
+            _display.material = _turnedOffMaterial;
         }
 
         public bool TryConnectGamer(Gamer gamer, out IInputSenderMap inputSenderMap)

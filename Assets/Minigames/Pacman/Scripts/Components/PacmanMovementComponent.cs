@@ -6,10 +6,12 @@ namespace gamer.pacman
     public class PacmanMovementComponent : MonoBehaviour
     {
         [SerializeField] float _speed;
-        [SerializeField] Vector2InputSender _movementInputSender;
+        Vector2InputSender _movementInputSender;
 
         PacmanMovement _pacmanMovement;
         Transform _transform;
+
+        public PacmanMovement Movement => _pacmanMovement;
 
         void Awake()
         {
@@ -17,30 +19,16 @@ namespace gamer.pacman
             _pacmanMovement = new PacmanMovement(_speed);
         }
 
-        void OnEnable()
+        void Update()
         {
-            _movementInputSender.OnInput += HandleMovementInput;
-
-            //debug
-            _movementInputSender.InputAction.action.performed += DebugMovement;
-            _movementInputSender.InputAction.action.canceled += DebugMovement;
-            _movementInputSender.InputAction.action.Enable();
+            _pacmanMovement.UpdateMove(PacmanWorld.Instance.Layout);
+            _transform.localPosition = (Vector2)_pacmanMovement.Position;
         }
 
         //todo: remove debug
         void DebugMovement(UnityEngine.InputSystem.InputAction.CallbackContext obj)
         {
             HandleMovementInput(obj.ReadValue<Vector2>());
-        }
-
-        void OnDisable()
-        {
-            _movementInputSender.OnInput -= HandleMovementInput;
-
-            //debug
-            _movementInputSender.InputAction.action.performed -= DebugMovement;
-            _movementInputSender.InputAction.action.canceled -= DebugMovement;
-            _movementInputSender.InputAction.action.Disable();
         }
 
         void HandleMovementInput(Vector2 value)
@@ -52,10 +40,16 @@ namespace gamer.pacman
             _pacmanMovement.SetDesiredMoveDirection((float2)value);
         }
 
-        void Update()
+        public void SetInputSender(Vector2InputSender inputSender)
         {
-            _pacmanMovement.UpdateMove(PacmanWorld.Instance.Layout);
-            _transform.localPosition = (Vector2)_pacmanMovement.Position;
+            _movementInputSender = inputSender;
+
+            _movementInputSender.OnInput += HandleMovementInput;
+
+            //debug
+            _movementInputSender.InputAction.action.performed += DebugMovement;
+            _movementInputSender.InputAction.action.canceled += DebugMovement;
+            _movementInputSender.InputAction.action.Enable();
         }
     }
 }

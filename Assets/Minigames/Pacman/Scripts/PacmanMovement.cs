@@ -1,25 +1,25 @@
 using UnityEngine;
 using Unity.Mathematics;
+using System;
 
 namespace gamer.pacman
 {
-    public struct PacmanMovement
+    public class PacmanMovement
     {
         float2 _position;
         float _speed;
         float2 _desiredMoveDirection;
 
         float2 _targetPosition;
-        float2 _currentMoveDirection;
+        public event Action OnTargetPositionReached;
 
-        public float2 Position => _position;
+        public float2 Position { get => _position; set => _position = value; }
 
         public PacmanMovement(float speed, float2 position = default)
         {
             _speed = speed;
             _position = position;
             _desiredMoveDirection = float2.zero;
-            _currentMoveDirection = float2.zero;
             _targetPosition = position;
         }
 
@@ -27,17 +27,18 @@ namespace gamer.pacman
         {
             if (MoveToTarget())
             {
+                OnTargetPositionReached?.Invoke();
+                var direction = math.normalizesafe(_targetPosition - _position);
                 if (CanMoveInDirection(_desiredMoveDirection, layout))
                 {
-                    _currentMoveDirection = _desiredMoveDirection;
-                    var targetCoords = layout.GetCoordsFromPosition(_position) + (int2)_currentMoveDirection;
-                    if (!(_currentMoveDirection == float2.zero).Equals(new bool2(true, true)))
+                    var targetCoords = layout.GetCoordsFromPosition(_position) + (int2)_desiredMoveDirection;
+                    if (!(_desiredMoveDirection == float2.zero).Equals(new bool2(true, true)))
                         _targetPosition = layout.GetPositionFromCoords(targetCoords);
                 }
-                else if (CanMoveInDirection(_currentMoveDirection, layout))
+                else if (!(direction == float2.zero).Equals(new bool2(true, true)) && CanMoveInDirection(direction, layout))
                 {
-                    var targetCoords = layout.GetCoordsFromPosition(_position) + (int2)_currentMoveDirection;
-                    if (!(_currentMoveDirection == float2.zero).Equals(new bool2(true, true)))
+                    var targetCoords = layout.GetCoordsFromPosition(_position) + (int2)_desiredMoveDirection;
+                    if (!(_desiredMoveDirection == float2.zero).Equals(new bool2(true, true)))
                         _targetPosition = layout.GetPositionFromCoords(targetCoords);
                 }
             }
@@ -51,7 +52,8 @@ namespace gamer.pacman
 
         bool MoveToTarget()
         {
-            var nextPosition = _position + Time.deltaTime * _speed * _currentMoveDirection;
+            var direction = math.normalizesafe(_targetPosition - _position);
+            var nextPosition = _position + Time.deltaTime * _speed * direction;
             _position = nextPosition;
 
             if ((Vector2)_targetPosition == (Vector2)nextPosition)
@@ -60,7 +62,7 @@ namespace gamer.pacman
                 return true;
             }
             
-            var directionDot = math.dot(_currentMoveDirection, math.normalize(_targetPosition - nextPosition));
+            var directionDot = math.dot(direction, math.normalize(_targetPosition - nextPosition));
             if (directionDot < 0)
             {
                 _position = _targetPosition;

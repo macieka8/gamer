@@ -7,7 +7,7 @@ namespace gamer.pacman
     {
         int _points;
 
-        public static event Action OnPointsCollected;
+        public static event Action<int> OnPointsCollected;
 
         public int Points => _points;
 
@@ -29,7 +29,7 @@ namespace gamer.pacman
             {
                 _points += 10;
                 PacmanWorld.Instance.Layout.SetTileAtCoords(playerCoords, PacmanLayout.TileType.Walkable);
-                OnPointsCollected?.Invoke();
+                OnPointsCollected?.Invoke(_points);
             }
         }
     }

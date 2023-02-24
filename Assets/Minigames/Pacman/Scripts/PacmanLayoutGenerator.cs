@@ -19,7 +19,7 @@ namespace gamer.pacman
                     }
                     else
                     {
-                        tiles[x + y * dimensions.x] = PacmanLayout.TileType.Walkable;
+                        tiles[x + y * dimensions.x] = PacmanLayout.TileType.SmallPoint;
                     }
                 }
             }

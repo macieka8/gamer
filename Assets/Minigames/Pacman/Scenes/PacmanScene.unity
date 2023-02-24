@@ -286,6 +286,7 @@ GameObject:
   - component: {fileID: 1771428069}
   - component: {fileID: 1771428068}
   - component: {fileID: 1771428070}
+  - component: {fileID: 1771428071}
   m_Layer: 0
   m_Name: Pacman World
   m_TagString: Untagged
@@ -367,6 +368,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _action: {fileID: 3983166144167379798, guid: c6c2ea926f5c5cc4ba1d1588e985ff14, type: 3}
+--- !u!114 &1771428071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1771428066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae3cea707c6e0c149845439b8833a43a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1787843158
 GameObject:
   m_ObjectHideFlags: 0

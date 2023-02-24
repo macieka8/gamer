@@ -47,7 +47,7 @@ namespace gamer.pacman
         bool CanMoveInDirection(float2 direction, PacmanLayout layout)
         {
             var testCoords = layout.GetCoordsFromPosition(_position) + (int2)direction;
-            return layout.GetTileAtCoords(testCoords) == PacmanLayout.TileType.Walkable;
+            return layout.GetTileAtCoords(testCoords) != PacmanLayout.TileType.Wall;
         }
 
         bool MoveToTarget()

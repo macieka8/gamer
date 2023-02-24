@@ -1,18 +1,22 @@
 ﻿using Unity.Mathematics;
+using System;
 
 namespace gamer.pacman
 {
-    public struct PacmanLayout
+    public class PacmanLayout
     {
         public enum TileType
         {
             Walkable,
             Wall,
+            SmallPoint,
         }
 
         public float2 tileSize;
         public int2 mapDimensions;
         public TileType[] tiles;
+
+        public event Action<int2> OnTileChanged;
 
         public PacmanLayout(int2 mapDimensions, float2 tileSize, TileType[] tiles)
         {
@@ -54,6 +58,12 @@ namespace gamer.pacman
         public float2 GetPositionFromCoords(int2 coords)
         {
             return GetPositionFromCoords(coords.x, coords.y);
+        }
+
+        public void SetTileAtCoords(int2 coords, TileType newTileType)
+        {
+            tiles[coords.x + coords.y * mapDimensions.x] = newTileType;
+            OnTileChanged?.Invoke(coords);
         }
     }
 }

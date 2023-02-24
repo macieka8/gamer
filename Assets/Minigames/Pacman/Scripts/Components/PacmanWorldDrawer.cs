@@ -22,12 +22,7 @@ namespace gamer.pacman
                     var tile = layout.GetTileAtCoords(x, y);
                     if (tile == PacmanLayout.TileType.Wall)
                     {
-                        var wallPosition = layout.GetPositionFromCoords(x, y);
-                        var wall = Instantiate(
-                            _wallPrefab, transform);
-                        wall.transform.localPosition = (Vector2)wallPosition;
-                        wall.transform.localScale = (Vector2)layout.tileSize;
-                        _tiles[x + y * layout.mapDimensions.x] = wall;
+                        CreateWall(new int2(x, y));
                     }
                     else if (tile == PacmanLayout.TileType.SmallPoint)
                     {
@@ -43,14 +38,42 @@ namespace gamer.pacman
             PacmanWorld.Instance.Layout.OnTileChanged += HandleLayoutChanged;
         }
 
+        void CreateWall(int2 coords)
+        {
+            var layout = PacmanWorld.Instance.Layout;
+
+            var wallPosition = layout.GetPositionFromCoords(coords.x, coords.y);
+            var wall = Instantiate(
+                _wallPrefab, transform);
+            wall.transform.localPosition = (Vector2)wallPosition;
+            wall.transform.localScale = (Vector2)layout.tileSize;
+            _tiles[coords.x + coords.y * layout.mapDimensions.x] = wall;
+        }
+
+        void CreateSmallPoint(int2 coords)
+        {
+            var layout = PacmanWorld.Instance.Layout;
+
+            var pointPosition = layout.GetPositionFromCoords(coords.x, coords.y);
+            var point = Instantiate(
+                _pointPrefab, transform);
+            point.transform.localPosition = (Vector2)pointPosition;
+            _tiles[coords.x + coords.y * layout.mapDimensions.x] = point;
+        }
+
         void HandleLayoutChanged(int2 coords)
         {
             var tileType = PacmanWorld.Instance.Layout.GetTileAtCoords(coords);
             var objectToChange = _tiles[coords.x + coords.y * PacmanWorld.Instance.Layout.mapDimensions.x];
-            if (tileType == PacmanLayout.TileType.Walkable)
+            if (objectToChange != null)
+                Destroy(objectToChange);
+            if (tileType == PacmanLayout.TileType.Wall)
             {
-                if (objectToChange != null)
-                    Destroy(objectToChange);
+                CreateWall(coords);
+            }
+            else if (tileType == PacmanLayout.TileType.SmallPoint)
+            {
+                CreateSmallPoint(coords);
             }
         }
     }

@@ -14,7 +14,7 @@ namespace gamer.pacman
         void Start()
         {
             _points = 0;
-            PacmanWorld.Instance.Player.OnTargetPositionReached += HandleTargetReached;
+            PacmanWorld.Instance.OnPlayerReachedTargetPosition += HandleTargetReached;
         }
 
         void HandleTargetReached()

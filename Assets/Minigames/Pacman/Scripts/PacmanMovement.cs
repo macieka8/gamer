@@ -13,7 +13,7 @@ namespace gamer.pacman
         float2 _targetPosition;
         public event Action OnTargetPositionReached;
 
-        public float2 Position { get => _position; set => _position = value; }
+        public float2 Position { get => _position; set { _position = value; _targetPosition = value; } }
 
         public PacmanMovement(float speed, float2 position = default)
         {

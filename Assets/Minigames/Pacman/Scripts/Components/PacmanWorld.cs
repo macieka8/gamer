@@ -6,7 +6,7 @@ namespace gamer.pacman
 {
     public class PacmanWorld : MonoBehaviour
     {
-        public const float minSafeDistanceSq = 1f;
+        public const float minSafeDistanceSq = 0.25f;
         static PacmanWorld _instance;
         public static PacmanWorld Instance => _instance;
 
@@ -65,6 +65,7 @@ namespace gamer.pacman
             var player = Instantiate(_playerPrefab, transform);
             player.SetInputSender(_playerMovementInputSender);
             _player = player.Movement;
+            _player.Position = _layout.GetPositionFromCoords(_playerSpawnCoords);
             _player.OnTargetPositionReached += PlayerReachedTargetPosition;
             _playerGameObject = player.gameObject;
 
@@ -74,7 +75,8 @@ namespace gamer.pacman
             {
                 var ghost = Instantiate(_ghostPrefab, transform);
                 ghost.Movement.Position = _layout.GetPositionFromCoords(_ghostSpawnCoords);
-                Ghosts[i] = ghost.Movement;
+                _ghosts[i] = ghost.Movement;
+                _ghosts[i].Position = _layout.GetPositionFromCoords(_ghostSpawnCoords);
                 _ghostGameObjects[i] = ghost.gameObject;
             }
         }

@@ -12,7 +12,6 @@ namespace gamer.pacman
 
         [Header("Layout Options")]
         [SerializeField] float2 _tileSize;
-        //[SerializeField] int2 _layoutDimensions;
 
         [Header("Ghost Options")]
         [SerializeField] int _ghostCount;
@@ -42,8 +41,7 @@ namespace gamer.pacman
             if (_instance == null)
             {
                 _instance = this;
-                //_layout = PacmanLayoutGenerator.GenerateLayout(_layoutDimensions, _tileSize);
-                _layout = PacmanLayoutGenerator.GetLayoutFromTetrisMap(PacmanLayoutGenerator.GetTetrisPiecesMap5x9());
+                _layout = PacmanLayoutGenerator.GenerateLayout(_tileSize);
                 CreateWorld();
             }
         }

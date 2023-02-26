@@ -12,6 +12,27 @@ namespace gamer.pacman
 
         void Start()
         {
+            BuildLayout();
+
+            PacmanWorld.Instance.Layout.OnTileChanged += HandleTileChanged;
+            PacmanWorld.Instance.Layout.OnTilesChanged += HandleLayoutChanged;
+        }
+
+        void DestroyTiles()
+        {
+            if (_tiles != null)
+            {
+                for (int i = 0; i < _tiles.Length; i++)
+                {
+                    if (_tiles[i] != null)
+                        Destroy(_tiles[i]);
+                }
+            }
+        }
+
+        void BuildLayout()
+        {
+            DestroyTiles();
             var layout = PacmanWorld.Instance.Layout;
             _tiles = new GameObject[layout.mapDimensions.x * layout.mapDimensions.y];
 
@@ -34,8 +55,6 @@ namespace gamer.pacman
                     }
                 }
             }
-
-            PacmanWorld.Instance.Layout.OnTileChanged += HandleLayoutChanged;
         }
 
         void CreateWall(int2 coords)
@@ -61,7 +80,7 @@ namespace gamer.pacman
             _tiles[coords.x + coords.y * layout.mapDimensions.x] = point;
         }
 
-        void HandleLayoutChanged(int2 coords)
+        void HandleTileChanged(int2 coords)
         {
             var tileType = PacmanWorld.Instance.Layout.GetTileAtCoords(coords);
             var objectToChange = _tiles[coords.x + coords.y * PacmanWorld.Instance.Layout.mapDimensions.x];
@@ -75,6 +94,11 @@ namespace gamer.pacman
             {
                 CreateSmallPoint(coords);
             }
+        }
+
+        void HandleLayoutChanged()
+        {
+            BuildLayout();
         }
     }
 }

@@ -19,9 +19,12 @@ namespace gamer.pacman
         [SerializeField] GhostComponent _ghostPrefab;
 
         [Header("Player Options")]
+        [SerializeField] int _startingLives;
         [SerializeField] int2 _playerSpawnCoords;
         [SerializeField] PacmanMovementComponent _playerPrefab;
         [SerializeField] Vector2InputSender _playerMovementInputSender;
+
+        int _lives;
 
         PacmanLayout _layout;
         PacmanMovement _player;
@@ -31,6 +34,7 @@ namespace gamer.pacman
         GameObject[] _ghostGameObjects;
 
         public Action OnPlayerReachedTargetPosition;
+        public Action<int> OnPlayerLiveChanged;
 
         public PacmanLayout Layout => _layout;
         public PacmanMovement Player => _player;
@@ -41,8 +45,12 @@ namespace gamer.pacman
             if (_instance == null)
             {
                 _instance = this;
+                
+                _lives = _startingLives;
+                OnPlayerLiveChanged?.Invoke(_lives);
+
                 _layout = PacmanLayoutGenerator.GenerateLayout(_tileSize);
-                CreateWorld();
+                CreateWorldEntities();
             }
         }
 
@@ -59,7 +67,7 @@ namespace gamer.pacman
             _instance = null;
         }
 
-        void CreateWorld()
+        void CreateWorldEntities()
         {
             var player = Instantiate(_playerPrefab, transform);
             player.SetInputSender(_playerMovementInputSender);
@@ -80,6 +88,12 @@ namespace gamer.pacman
             }
         }
 
+        void CreateNewWorld()
+        {
+            var newLayout = PacmanLayoutGenerator.GenerateLayout(_tileSize);
+            _layout.OverrideLayoutData(newLayout.mapDimensions, newLayout.tileSize, newLayout.tiles);
+        }
+
         void PlayerReachedTargetPosition()
         {
             OnPlayerReachedTargetPosition?.Invoke();
@@ -97,15 +111,32 @@ namespace gamer.pacman
             return false;
         }
 
-        void HandlePlayerDied()
+        void DestroyAllWorldEntiies()
         {
             Destroy(_playerGameObject);
             for (int i = 0; i < _ghostCount; i++)
             {
                 Destroy(_ghostGameObjects[i]);
             }
+        }
 
-            CreateWorld();
+        void HandlePlayerDied()
+        {
+            DestroyAllWorldEntiies();
+            CreateWorldEntities();
+            
+            _lives--;
+            if (_lives == 0)
+                HandleZeroLives();
+
+            OnPlayerLiveChanged?.Invoke(_lives);
+        }
+
+        void HandleZeroLives()
+        {
+            _lives = _startingLives;
+            OnPlayerLiveChanged?.Invoke(_lives);
+            CreateNewWorld();
         }
     }
 }

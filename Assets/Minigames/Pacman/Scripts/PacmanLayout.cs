@@ -17,6 +17,7 @@ namespace gamer.pacman
         public TileType[] tiles;
 
         public event Action<int2> OnTileChanged;
+        public event Action OnTilesChanged;
 
         public PacmanLayout(int2 mapDimensions, float2 tileSize, TileType[] tiles)
         {
@@ -64,6 +65,14 @@ namespace gamer.pacman
         {
             tiles[coords.x + coords.y * mapDimensions.x] = newTileType;
             OnTileChanged?.Invoke(coords);
+        }
+
+        public void OverrideLayoutData(int2 mapDimensions, float2 tileSize, TileType[] tiles)
+        {
+            this.mapDimensions = mapDimensions;
+            this.tileSize = tileSize;
+            this.tiles = tiles;
+            OnTilesChanged?.Invoke();
         }
     }
 }

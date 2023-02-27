@@ -114,6 +114,7 @@ namespace gamer.pacman
             }
             #endregion
         }
+
         public static PacmanLayout GetLayoutFromTetrisMap(int[] tetrisMap, float2 tileSize)
         {
             // (5 {tetrisMap} * 3 {up-scaling} + 1 {for border}) * 2 {for mirroring}
@@ -154,6 +155,12 @@ namespace gamer.pacman
                     if (y == dimensions.y - 1 || x == 0 || y == 0)
                     {
                         tileType = PacmanLayout.TileType.Wall;
+                    }
+                    // ghost house
+                    // todo: check if ghost house is not surrounded by walls
+                    else if (x >= dimensions.x / 2 - 2 && y < dimensions.y / 2 + 2 && y > dimensions.y / 2 - 2)
+                    {
+                        tileType = PacmanLayout.TileType.Walkable;
                     }
                     // crossroads
                     else if ((x - 1) % 3 == 0 && (y - 1) % 3 == 0)

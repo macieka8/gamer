@@ -15,12 +15,10 @@ namespace gamer.pacman
 
         [Header("Ghost Options")]
         [SerializeField] int _ghostCount;
-        [SerializeField] int2 _ghostSpawnCoords;
         [SerializeField] GhostComponent _ghostPrefab;
 
         [Header("Player Options")]
         [SerializeField] int _startingLives;
-        [SerializeField] int2 _playerSpawnCoords;
         [SerializeField] PacmanMovementComponent _playerPrefab;
         [SerializeField] Vector2InputSender _playerMovementInputSender;
 
@@ -72,7 +70,7 @@ namespace gamer.pacman
             var player = Instantiate(_playerPrefab, transform);
             player.SetInputSender(_playerMovementInputSender);
             _player = player.Movement;
-            _player.Position = _layout.GetPositionFromCoords(_playerSpawnCoords);
+            _player.Position = _layout.GetPositionFromCoords(new int2 (_layout.mapDimensions.x / 2, 1));
             _player.OnTargetPositionReached += PlayerReachedTargetPosition;
             _playerGameObject = player.gameObject;
 
@@ -81,9 +79,8 @@ namespace gamer.pacman
             for (int i = 0; i < _ghostCount; i++)
             {
                 var ghost = Instantiate(_ghostPrefab, transform);
-                ghost.Movement.Position = _layout.GetPositionFromCoords(_ghostSpawnCoords);
                 _ghosts[i] = ghost.Movement;
-                _ghosts[i].Position = _layout.GetPositionFromCoords(_ghostSpawnCoords);
+                _ghosts[i].Position = _layout.GetPositionFromCoords(_layout.mapDimensions / 2);
                 _ghostGameObjects[i] = ghost.gameObject;
             }
         }

@@ -36,10 +36,41 @@ namespace gamer.pacman
         void HandleTargetReached()
         {
             var isFollowingPlayer = UnityEngine.Random.Range(0, 2) == 0;
-            if (isFollowingPlayer)
-                _movement.SetDesiredMoveDirection(GetMoveDirectionToPlayer());
+            float2 newDirection;
+
+            if (isFollowingPlayer && GetPossibleDirectionsCount() > 2)
+            {
+                newDirection = GetMoveDirectionToPlayer();
+            }
             else
-                _movement.SetDesiredMoveDirection(GetRandomMoveDirection());
+            {
+                do
+                {
+                    newDirection = GetRandomMoveDirection();
+                } while ((newDirection == -_movement.PreviousDirection).Equals(new bool2(true, true)));
+            }
+
+            _movement.SetDesiredMoveDirection(newDirection);
+        }
+
+        int GetPossibleDirectionsCount()
+        {
+            var directions = new float2[]{
+                math.right().xy,
+                math.up().xy,
+                math.left().xy,
+                math.down().xy };
+            var layout = PacmanWorld.Instance.Layout;
+            int count = 0;
+
+            for (int i = 0; i < directions.Length; i++)
+            {
+                if (_movement.CanMoveInDirection(directions[i], layout))
+                {
+                    count++;
+                }
+            }
+            return count;
         }
 
         float2 GetRandomMoveDirection()

@@ -15,6 +15,7 @@ namespace gamer.pacman
         public event Action OnTargetPositionReached;
 
         public float2 Position { get => _position; set { _position = value; _targetPosition = value; } }
+        public float2 PreviousDirection => _previousDirection;
 
         public PacmanMovement(float speed, float2 position = default)
         {
@@ -48,7 +49,7 @@ namespace gamer.pacman
             }
         }
 
-        bool CanMoveInDirection(float2 direction, PacmanLayout layout)
+        public bool CanMoveInDirection(float2 direction, PacmanLayout layout)
         {
             var testCoords = layout.GetCoordsFromPosition(_position) + (int2)direction;
             return layout.GetTileAtCoords(testCoords) != PacmanLayout.TileType.Wall;

@@ -10,6 +10,8 @@ namespace gamer.pacman
 
         void Start()
         {
+            _livesText.text = PacmanWorld.Instance.StartingLives.ToString();
+
             PointsCounter.OnPointsCollected += HandlePointsCollected;
             PacmanWorld.Instance.OnPlayerLiveChanged += HandlePlayerDeath;
         }

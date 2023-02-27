@@ -156,6 +156,11 @@ namespace gamer.pacman
                     {
                         tileType = PacmanLayout.TileType.Wall;
                     }
+                    // Big points
+                    else if (x == 1 && (y == 1 || y == dimensions.y - 2))
+                    {
+                        tileType = PacmanLayout.TileType.BigPoint;
+                    }
                     // ghost house
                     // todo: check if ghost house is not surrounded by walls
                     else if (x >= dimensions.x / 2 - 2 && y < dimensions.y / 2 + 2 && y > dimensions.y / 2 - 2)

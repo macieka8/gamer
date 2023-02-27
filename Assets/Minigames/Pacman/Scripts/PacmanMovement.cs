@@ -15,6 +15,7 @@ namespace gamer.pacman
         public event Action OnTargetPositionReached;
 
         public float2 Position { get => _position; set { _position = value; _targetPosition = value; } }
+        public float Speed { get => _speed; set => _speed = value; }
         public float2 PreviousDirection => _previousDirection;
 
         public PacmanMovement(float speed, float2 position = default)
@@ -24,6 +25,29 @@ namespace gamer.pacman
             _desiredMoveDirection = float2.zero;
             _previousDirection = float2.zero;
             _targetPosition = position;
+        }
+
+        bool MoveToTarget()
+        {
+            var direction = math.normalizesafe(_targetPosition - _position);
+            _previousDirection = math.length(direction) == 1f ? direction : _previousDirection;
+
+            var nextPosition = _position + Time.deltaTime * _speed * direction;
+            _position = nextPosition;
+
+            if ((Vector2)_targetPosition == (Vector2)nextPosition)
+            {
+                _position = _targetPosition;
+                return true;
+            }
+
+            var directionDot = math.dot(direction, math.normalize(_targetPosition - nextPosition));
+            if (directionDot < 0)
+            {
+                _position = _targetPosition;
+                return true;
+            }
+            return false;
         }
 
         public void UpdateMove(PacmanLayout layout)
@@ -53,29 +77,6 @@ namespace gamer.pacman
         {
             var testCoords = layout.GetCoordsFromPosition(_position) + (int2)direction;
             return layout.GetTileAtCoords(testCoords) != PacmanLayout.TileType.Wall;
-        }
-
-        bool MoveToTarget()
-        {
-            var direction = math.normalizesafe(_targetPosition - _position);
-            _previousDirection = math.length(direction) == 1f ? direction : _previousDirection;
-
-            var nextPosition = _position + Time.deltaTime * _speed * direction;
-            _position = nextPosition;
-
-            if ((Vector2)_targetPosition == (Vector2)nextPosition)
-            {
-                _position = _targetPosition;
-                return true;
-            }
-            
-            var directionDot = math.dot(direction, math.normalize(_targetPosition - nextPosition));
-            if (directionDot < 0)
-            {
-                _position = _targetPosition;
-                return true;
-            }
-            return false;
         }
 
         public void SetDesiredMoveDirection(float2 direction)

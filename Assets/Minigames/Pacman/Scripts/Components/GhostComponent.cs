@@ -29,7 +29,8 @@ namespace gamer.pacman
 
         void Update()
         {
-            Movement.UpdateMove(PacmanWorld.Instance.Layout);
+            Ghost.UpdateFear(Time.deltaTime);
+            Ghost.Movement.UpdateMove(PacmanWorld.Instance.Layout);
             transform.localPosition = (Vector2)Movement.Position;
         }
 

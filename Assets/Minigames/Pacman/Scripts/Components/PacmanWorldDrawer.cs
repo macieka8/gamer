@@ -7,6 +7,7 @@ namespace gamer.pacman
     {
         [SerializeField] GameObject _wallPrefab;
         [SerializeField] GameObject _pointPrefab;
+        [SerializeField] GameObject _bigPointPrefab;
 
         GameObject[] _tiles;
 
@@ -47,11 +48,11 @@ namespace gamer.pacman
                     }
                     else if (tile == PacmanLayout.TileType.SmallPoint)
                     {
-                        var pointPosition = layout.GetPositionFromCoords(x, y);
-                        var point = Instantiate(
-                            _pointPrefab, transform);
-                        point.transform.localPosition = (Vector2)pointPosition;
-                        _tiles[x + y * layout.mapDimensions.x] = point;
+                        CreateSmallPoint(new int2(x, y));
+                    }
+                    else if (tile == PacmanLayout.TileType.BigPoint)
+                    {
+                        CreateBigPoint(new int2(x, y));
                     }
                 }
             }
@@ -76,6 +77,17 @@ namespace gamer.pacman
             var pointPosition = layout.GetPositionFromCoords(coords.x, coords.y);
             var point = Instantiate(
                 _pointPrefab, transform);
+            point.transform.localPosition = (Vector2)pointPosition;
+            _tiles[coords.x + coords.y * layout.mapDimensions.x] = point;
+        }
+
+        void CreateBigPoint(int2 coords)
+        {
+            var layout = PacmanWorld.Instance.Layout;
+
+            var pointPosition = layout.GetPositionFromCoords(coords.x, coords.y);
+            var point = Instantiate(
+                _bigPointPrefab, transform);
             point.transform.localPosition = (Vector2)pointPosition;
             _tiles[coords.x + coords.y * layout.mapDimensions.x] = point;
         }

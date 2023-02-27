@@ -13,9 +13,9 @@ namespace gamer.pacman
 
         void Start()
         {
-            _points = PacmanWorld.Instance.StartingLives;
             PacmanWorld.Instance.OnPlayerReachedTargetPosition += HandleTargetReached;
             PacmanWorld.Instance.OnPlayerLose += HandlePlayerLose;
+            PacmanWorld.Instance.OnGhostEaten += HandleGhostEaten;
         }
 
         void HandlePlayerLose()
@@ -37,6 +37,17 @@ namespace gamer.pacman
                 PacmanWorld.Instance.Layout.SetTileAtCoords(playerCoords, PacmanLayout.TileType.Walkable);
                 OnPointsCollected?.Invoke(_points);
             }
+            else if (tileType == PacmanLayout.TileType.BigPoint)
+            {
+                _points += 50;
+                PacmanWorld.Instance.Layout.SetTileAtCoords(playerCoords, PacmanLayout.TileType.Walkable);
+                OnPointsCollected?.Invoke(_points);
+            }
+        }
+
+        void HandleGhostEaten()
+        {
+            _points += 200;
         }
     }
 }

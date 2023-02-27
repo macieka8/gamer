@@ -6,11 +6,20 @@ namespace gamer.pacman
     {
         PacmanMovement _movement;
 
+        float normalSpeed;
+        float fearedSpeed;
+        float fearDurationLeft;
+
         public PacmanMovement Movement => _movement;
+        public bool IsFeared { 
+            get => fearDurationLeft > 0f;
+        }
 
         public Ghost(float speed, float2 position)
         {
-            _movement = new PacmanMovement(speed, position);
+            normalSpeed = speed;
+            fearedSpeed = speed / 2f;
+            _movement = new PacmanMovement(normalSpeed, position);
         }
 
         int GetPossibleDirectionsCount(PacmanLayout layout)
@@ -58,23 +67,67 @@ namespace gamer.pacman
 
         public void ChooseNextDirection(PacmanLayout layout, PacmanMovement player)
         {
-            var isFollowingPlayer = UnityEngine.Random.Range(0, 2) == 0;
-            float2 newDirection;
-
-            if (isFollowingPlayer && GetPossibleDirectionsCount(layout) > 2)
+            float2 newDirection = float2.zero;
+            if (IsFeared)
             {
-                newDirection = GetMoveDirectionToPlayer(player);
+                var directionToPlayer = GetMoveDirectionToPlayer(player);
+                if (GetPossibleDirectionsCount(layout) > 2)
+                {
+                    do
+                    {
+                        newDirection = PacmanLayout.GetRandomMoveDirection();
+                    } while ((newDirection == directionToPlayer).Equals(new bool2(true, true)));
+                }
+                else
+                {
+                    do
+                    {
+                        newDirection = PacmanLayout.GetRandomMoveDirection();
+                    } while ((newDirection == -_movement.PreviousDirection).Equals(new bool2(true, true)));
+                }
             }
             else
             {
-                do
-                {
-                    newDirection = PacmanLayout.GetRandomMoveDirection();
-                } while ((newDirection == -_movement.PreviousDirection).Equals(new bool2(true, true)));
-            }
+                var isFollowingPlayer = UnityEngine.Random.Range(0, 2) == 0;
 
+                if (isFollowingPlayer && GetPossibleDirectionsCount(layout) > 2)
+                {
+                    newDirection = GetMoveDirectionToPlayer(player);
+                }
+                else
+                {
+                    do
+                    {
+                        newDirection = PacmanLayout.GetRandomMoveDirection();
+                    } while ((newDirection == -_movement.PreviousDirection).Equals(new bool2(true, true)));
+                }
+            }
             _movement.SetDesiredMoveDirection(newDirection);
         }
 
+        public void Fear(float fearDurationInSeconds)
+        {
+            fearDurationLeft = fearDurationInSeconds;
+            _movement.Speed = fearedSpeed;
+        }
+
+        public void ClearFear()
+        {
+            fearDurationLeft = 0f;
+            _movement.Speed = normalSpeed;
+        }
+
+        public void UpdateFear(float deltaTime)
+        {
+
+            if (IsFeared)
+            {
+                fearDurationLeft -= deltaTime;
+            }
+            else
+            {
+                _movement.Speed = normalSpeed;
+            }
+        }
     }
 }

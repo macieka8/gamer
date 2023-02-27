@@ -5,11 +5,25 @@ namespace gamer.pacman
 {
     public class PacmanLayout
     {
+        public static readonly float2[] DIRECTIONS = new float2[]
+        {
+                math.right().xy,
+                math.up().xy,
+                math.left().xy,
+                math.down().xy
+        };
+        
+        public static readonly float2 RIGHT = DIRECTIONS[0];
+        public static readonly float2 UP = DIRECTIONS[1];
+        public static readonly float2 LEFT = DIRECTIONS[2];
+        public static readonly float2 DOWN = DIRECTIONS[3];
+
         public enum TileType
         {
             Walkable,
             Wall,
             SmallPoint,
+            BigPoint
         }
 
         public float2 tileSize;
@@ -51,7 +65,7 @@ namespace gamer.pacman
 
         public float2 GetPositionFromCoords(int x, int y)
         {
-            int2 coords = new int2(x, y);
+            var coords = new int2(x, y);
             float2 startPosition = -tileSize * mapDimensions / 2f;
             return startPosition + (float2)coords * tileSize;
         }
@@ -75,16 +89,28 @@ namespace gamer.pacman
             OnTilesChanged?.Invoke();
         }
 
-        public int CountTileTypes(TileType tileType)
+        public int CountTileTypes(params TileType[] tileTypes)
         {
             int count = 0;
             for (int i = 0; i < tiles.Length; i++)
             {
-                if (tiles[i] == tileType)
-                    count++;
+                for (int typeIndex = 0; typeIndex < tileTypes.Length; typeIndex++)
+                {
+                    if (tiles[i] == tileTypes[typeIndex])
+                    {
+                        count++;
+                        break;
+                    }
+                }
             }
 
             return count;
+        }
+
+        public static float2 GetRandomMoveDirection()
+        {
+            var rand = UnityEngine.Random.Range(0, 4);
+            return DIRECTIONS[rand];
         }
     }
 }

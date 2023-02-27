@@ -13,8 +13,14 @@ namespace gamer.pacman
 
         void Start()
         {
-            _points = 0;
+            _points = PacmanWorld.Instance.StartingLives;
             PacmanWorld.Instance.OnPlayerReachedTargetPosition += HandleTargetReached;
+            PacmanWorld.Instance.OnPlayerLose += HandlePlayerLose;
+        }
+
+        void HandlePlayerLose()
+        {
+            _points = 0;
         }
 
         void HandleTargetReached()

@@ -33,10 +33,13 @@ namespace gamer.pacman
 
         public Action OnPlayerReachedTargetPosition;
         public Action<int> OnPlayerLiveChanged;
+        public Action OnPlayerLose;
 
         public PacmanLayout Layout => _layout;
         public PacmanMovement Player => _player;
         public PacmanMovement[] Ghosts => _ghosts;
+
+        public int StartingLives => _startingLives;
 
         void Awake()
         {
@@ -94,6 +97,12 @@ namespace gamer.pacman
         void PlayerReachedTargetPosition()
         {
             OnPlayerReachedTargetPosition?.Invoke();
+            if (_layout.CountTileTypes(PacmanLayout.TileType.SmallPoint) == 0)
+            {
+                DestroyAllWorldEntiies();
+                CreateWorldEntities();
+                CreateNewWorld();
+            }
         }
 
         bool IsPlayerNearGhost()
@@ -133,6 +142,7 @@ namespace gamer.pacman
         {
             _lives = _startingLives;
             OnPlayerLiveChanged?.Invoke(_lives);
+            OnPlayerLose?.Invoke();
             CreateNewWorld();
         }
     }

@@ -74,5 +74,17 @@ namespace gamer.pacman
             this.tiles = tiles;
             OnTilesChanged?.Invoke();
         }
+
+        public int CountTileTypes(TileType tileType)
+        {
+            int count = 0;
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                if (tiles[i] == tileType)
+                    count++;
+            }
+
+            return count;
+        }
     }
 }

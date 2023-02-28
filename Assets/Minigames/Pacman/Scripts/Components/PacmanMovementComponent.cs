@@ -25,12 +25,6 @@ namespace gamer.pacman
             _transform.localPosition = (Vector2)_pacmanMovement.Position;
         }
 
-        //todo: remove debug
-        void DebugMovement(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-        {
-            HandleMovementInput(obj.ReadValue<Vector2>());
-        }
-
         void HandleMovementInput(Vector2 value)
         {
             if (value == Vector2.zero) return;
@@ -43,13 +37,7 @@ namespace gamer.pacman
         public void SetInputSender(Vector2InputSender inputSender)
         {
             _movementInputSender = inputSender;
-
             _movementInputSender.OnInput += HandleMovementInput;
-
-            //debug
-            _movementInputSender.InputAction.action.performed += DebugMovement;
-            _movementInputSender.InputAction.action.canceled += DebugMovement;
-            _movementInputSender.InputAction.action.Enable();
         }
     }
 }

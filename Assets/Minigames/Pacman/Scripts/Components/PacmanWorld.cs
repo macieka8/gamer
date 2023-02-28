@@ -1,6 +1,7 @@
 ﻿using Unity.Mathematics;
 using UnityEngine;
 using System;
+using UnityEngine.Events;
 
 namespace gamer.pacman
 {
@@ -22,6 +23,8 @@ namespace gamer.pacman
         [SerializeField] int _startingLives;
         [SerializeField] PacmanMovementComponent _playerPrefab;
         [SerializeField] Vector2InputSender _playerMovementInputSender;
+
+        [SerializeField] UnityEvent _onPlayerLose;
 
         int _lives;
         float2 _ghostSpawnPosition;
@@ -165,8 +168,11 @@ namespace gamer.pacman
         void HandleZeroLives()
         {
             _lives = _startingLives;
+            
             OnPlayerLiveChanged?.Invoke(_lives);
             OnPlayerLose?.Invoke();
+            _onPlayerLose.Invoke();
+
             CreateNewWorld();
         }
     }

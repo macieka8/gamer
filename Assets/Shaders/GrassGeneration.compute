@@ -1,0 +1,84 @@
+#pragma kernel CalculateBladePositions
+
+RWStructuredBuffer<float4x4> _transformMatrices;
+RWStructuredBuffer<float2> _worldUVBuffer;
+StructuredBuffer<float> _terrainHeightBuffer;
+
+uniform float _grassTerrainLengthX;
+uniform float _grassTerrainLengthZ;
+uniform int _grassBladesResolution;
+
+uniform float4x4 _terrainObjectToWorld;
+uniform float _minBladeHeight;
+uniform float _maxBladeHeight;
+uniform float _minOffset;
+uniform float _maxOffset;
+uniform float _bladeThicknessScale;
+
+#define TWO_PI 6.28318530718f
+
+// Function that takes a 2-element seed and returns a random value
+// between the min and max bounds.
+float randomRange(float2 seed, float min, float max)
+{
+	float randnum = frac(sin(dot(seed, float2(12.9898, 78.233)))*43758.5453);
+	return lerp(min, max, randnum);
+}
+
+// Function to rotate around the y-axis by a specified angle.
+float4x4 rotationMatrixY(float angle)
+{
+	float s, c;
+	sincos(angle, s, c);
+
+	return float4x4
+	(
+		 c, 0, s, 0,
+		 0, 1, 0, 0,
+		-s, 0, c, 0,
+		 0, 0, 0, 1
+	);
+}
+
+[numthreads(64, 1, 1)]
+void CalculateBladePositions(uint3 id : SV_DispatchThreadID)
+{
+	uint grassBladesCount = _grassBladesResolution * _grassBladesResolution;
+	// Avoid running 'overflow' tasks when the number of tasks
+	// wasn't divisible by the number of threads.
+	if (id.x > grassBladesCount)
+	{
+		return;
+	}
+
+	float2 deltaDistance = float2(_grassTerrainLengthX / _grassBladesResolution,
+		_grassTerrainLengthZ / _grassBladesResolution);
+	int2 coords = int2(id.x % _grassBladesResolution, id.x / _grassBladesResolution);
+
+	float2 startPosition = float2(- _grassTerrainLengthX / 2.0f, - _grassTerrainLengthZ / 2.0f);
+	float3 bladePosition = float3(
+		startPosition.x + coords.x * deltaDistance.x,
+		_terrainHeightBuffer[coords.x + coords.y * _grassBladesResolution],
+		startPosition.y + coords.y * deltaDistance.y);
+
+	float2 randomSeed1 = float2(id.x, id.y);
+	float2 randomSeed2 = float2(id.y, id.x);
+
+	float scaleY = randomRange(randomSeed1, _minBladeHeight, _maxBladeHeight);
+
+	float offsetX = randomRange(randomSeed1, _minOffset, _maxOffset);
+	float offsetZ = randomRange(randomSeed2, _minOffset, _maxOffset);
+
+	float4x4 grassTransformMatrix = float4x4
+	(
+		_bladeThicknessScale,	0,		0,						bladePosition.x + offsetX,
+		0,						scaleY,	0,						bladePosition.y,
+		0,						0,		_bladeThicknessScale,	bladePosition.z + offsetZ,
+		0,						0,		0,						1
+	);
+
+	float4x4 randomRotationMatrix = rotationMatrixY(randomRange(randomSeed1, 0.0f, TWO_PI));
+
+	_transformMatrices[id.x] = mul(_terrainObjectToWorld, mul(grassTransformMatrix, randomRotationMatrix));
+	_worldUVBuffer[id.x] = (float2)coords / (float)_grassBladesResolution;
+}

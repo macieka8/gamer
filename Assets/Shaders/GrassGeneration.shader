@@ -4,10 +4,13 @@ Shader "Custom/GrassGeneration"
 	{
 		_BaseColor("Base Color", Color) = (0, 0, 0, 1)
 		_TipColor("Tip Color", Color) = (1, 1, 1, 1)
+		_AOColor("Ambient Occlusion Color", Color) = (1, 1, 1, 1)
 		_WindFrequency("Wind Frequency", float) = 1
 		_WindOffsetMultiplier("Wind Offset Multiplier", float) = 1
 		_WindSpeed("Wind Speed", float) = 1
 		_NoiseTex("Noise Texture", 2D) = "white" {}
+		_NoiseFrequency("Noise Frequency", float) = 1
+		_NoiseAmplitude("Noise Amplitude", float) = 1
 	}
 
 	SubShader
@@ -38,6 +41,7 @@ Shader "Custom/GrassGeneration"
 				float4 positionCS : SV_Position;
 				float4 positionWS : TEXCOORD0;
 				float2 uv : TEXCOORD1;
+				//float2 worldUV : TEXCOORD2; // Uncomment for Visualization of Wind Offset
 			};
 
 			StructuredBuffer<float3> _normals;
@@ -49,18 +53,22 @@ Shader "Custom/GrassGeneration"
 			CBUFFER_START(UnityPerMaterial)
 				float4 _BaseColor;
 				float4 _TipColor;
+				float4 _AOColor;
 				float _WindOffsetMultiplier;
 				float _WindFrequency;
 				float _WindSpeed;
 				sampler2D _NoiseTex;
 				float4 _NoiseTex_ST;
+				float _NoiseFrequency;
+				float _NoiseAmplitude;
 
 				float _Cutoff;
 			CBUFFER_END
 
 			float2 CalculateWindOffset(float2 uv, float2 worldUV)
 			{
-				float windOffset = sin((worldUV.x + worldUV.y) * _WindFrequency + _Time * _WindSpeed) * tex2Dlod(_NoiseTex, float4(worldUV.xy, 0, 0)) * max(uv.y, 0) * _WindOffsetMultiplier;
+				float noiseValue = tex2Dlod(_NoiseTex, float4(worldUV.xy * _NoiseFrequency, 0, 0)) * _NoiseAmplitude;
+				float windOffset = sin((worldUV.x + worldUV.y) * _WindFrequency + _Time * _WindSpeed + noiseValue) * max(uv.y, 0) * max(uv.y, 0) * _WindOffsetMultiplier;
 				return windOffset.xx;
 			}
 		ENDHLSL
@@ -90,6 +98,7 @@ Shader "Custom/GrassGeneration"
 				o.positionWS = positionWS;
 				o.positionCS = mul(UNITY_MATRIX_VP, o.positionWS);
 				o.uv = uv;
+				//o.worldUV = worldUV; // Uncomment for Visualization of Wind Offset
 				return o;
 			}
 
@@ -106,7 +115,15 @@ Shader "Custom/GrassGeneration"
 				float4 shadowColor = lerp(0.0f, 1.0f, shadowAttenuation);
 				color *= shadowColor;
 //#endif
-				return color * lerp(_BaseColor, _TipColor, i.uv.y);
+				// Uncomment for Visualization of Wind Offset
+				//float texNoise = tex2Dlod(_NoiseTex, float4(i.worldUV.xy * _NoiseFrequency, 0, 0)) * _NoiseAmplitude;
+				//float value = (sin((i.worldUV.x + i.worldUV.y) * _WindFrequency + _Time * _WindSpeed + texNoise) + 1) / 2;
+				//return float4(value, value, value, 1);
+				
+				float3 lightDir = GetMainLight().direction;
+				float ndotl = dot(lightDir, normalize(float3(0, 1, 0)));
+				float4 ao = lerp(_AOColor, 1.0f, i.uv.y);
+				return color * lerp(_BaseColor, _TipColor, i.uv.y) * ndotl * ao;
 			}
 
             ENDHLSL

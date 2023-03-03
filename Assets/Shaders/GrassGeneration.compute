@@ -1,7 +1,7 @@
 #pragma kernel CalculateBladePositions
 
 RWStructuredBuffer<float4x4> _transformMatrices;
-RWStructuredBuffer<float2> _worldUVBuffer;
+StructuredBuffer<float2> _worldUVBuffer;
 StructuredBuffer<float> _terrainHeightBuffer;
 
 uniform float _grassTerrainLengthX;
@@ -14,6 +14,7 @@ uniform float _maxBladeHeight;
 uniform float _minOffset;
 uniform float _maxOffset;
 uniform float _bladeThicknessScale;
+uniform int _grassbladesCount;
 
 #define TWO_PI 6.28318530718f
 
@@ -43,23 +44,20 @@ float4x4 rotationMatrixY(float angle)
 [numthreads(64, 1, 1)]
 void CalculateBladePositions(uint3 id : SV_DispatchThreadID)
 {
-	uint grassBladesCount = _grassBladesResolution * _grassBladesResolution;
 	// Avoid running 'overflow' tasks when the number of tasks
 	// wasn't divisible by the number of threads.
-	if (id.x > grassBladesCount)
+	if (id.x > (uint)_grassbladesCount)
 	{
 		return;
 	}
 
-	float2 deltaDistance = float2(_grassTerrainLengthX / _grassBladesResolution,
-		_grassTerrainLengthZ / _grassBladesResolution);
-	int2 coords = int2(id.x % _grassBladesResolution, id.x / _grassBladesResolution);
+	float2 worldUV = _worldUVBuffer[id.x];
 
 	float2 startPosition = float2(- _grassTerrainLengthX / 2.0f, - _grassTerrainLengthZ / 2.0f);
 	float3 bladePosition = float3(
-		startPosition.x + coords.x * deltaDistance.x,
-		_terrainHeightBuffer[coords.x + coords.y * _grassBladesResolution],
-		startPosition.y + coords.y * deltaDistance.y);
+		startPosition.x + worldUV.x * _grassTerrainLengthX,
+		_terrainHeightBuffer[id.x],
+		startPosition.y + worldUV.y * _grassTerrainLengthZ);
 
 	float2 randomSeed1 = float2(id.x, id.y);
 	float2 randomSeed2 = float2(id.y, id.x);
@@ -80,5 +78,4 @@ void CalculateBladePositions(uint3 id : SV_DispatchThreadID)
 	float4x4 randomRotationMatrix = rotationMatrixY(randomRange(randomSeed1, 0.0f, TWO_PI));
 
 	_transformMatrices[id.x] = mul(_terrainObjectToWorld, mul(grassTransformMatrix, randomRotationMatrix));
-	_worldUVBuffer[id.x] = (float2)coords / (float)_grassBladesResolution;
 }

@@ -44,11 +44,16 @@ Shader "Custom/GrassGeneration"
 				//float2 worldUV : TEXCOORD2; // Uncomment for Visualization of Wind Offset
 			};
 
+			struct GrassData
+			{
+				float4x4 transformMatrix;
+				float2 worldUV;
+			};
+
 			StructuredBuffer<float3> _normals;
 			StructuredBuffer<float3> _positions;
 			StructuredBuffer<float2> _UVs;
-			StructuredBuffer<float4x4> _transformMatrices;
-			StructuredBuffer<float2> _worldUVBuffer;
+			StructuredBuffer<GrassData> _CulledGrassOutputBuffer;
 
 			CBUFFER_START(UnityPerMaterial)
 				float4 _BaseColor;
@@ -87,9 +92,9 @@ Shader "Custom/GrassGeneration"
 				v2f o;
 
 				float4 positionOS = float4(_positions[v.vertexID], 1.0f);
-				float4x4 objectToWorld = _transformMatrices[v.instanceID];
+				float4x4 objectToWorld = _CulledGrassOutputBuffer[v.instanceID].transformMatrix;
 				float2 uv = _UVs[v.vertexID];
-				float2 worldUV = _worldUVBuffer[v.instanceID];
+				float2 worldUV = _CulledGrassOutputBuffer[v.instanceID].worldUV;
 
 				float4 positionWS = mul(objectToWorld, positionOS);
 				float windOffset = CalculateWindOffset(uv, worldUV);
@@ -155,9 +160,9 @@ Shader "Custom/GrassGeneration"
 
 				float4 positionOS = float4(_positions[vertexID], 1.0f);
 				float3 normalOS = _normals[vertexID];
-				float4x4 objectToWorld = _transformMatrices[instanceID];
+				float4x4 objectToWorld = _CulledGrassOutputBuffer[instanceID].transformMatrix;
 				float2 uv = _UVs[vertexID];
-				float2 worldUV = _worldUVBuffer[instanceID];
+				float2 worldUV = _CulledGrassOutputBuffer[instanceID].worldUV;
 
 				float4 positionWS = mul(objectToWorld, positionOS);
 

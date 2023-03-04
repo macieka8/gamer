@@ -878,6 +878,7 @@ MonoBehaviour:
   _terrain: {fileID: 961307316}
   _grassBladesResolution: 250
   _emptyCenterDistance: 8
+  _distanceCutoff: 50
   _castShadows: 0
   _receiveShadows: 1
   _minBladeHeight: 0.4
@@ -885,6 +886,7 @@ MonoBehaviour:
   _minOffset: -0.5
   _maxOffset: 0.5
   _bladeThicknessScale: 0.4
+  _cullGrassShader: {fileID: 7200000, guid: 4dbcc7418563f41459ac28d5fe0732fa, type: 3}
 --- !u!4 &1433899876 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3385591108410124687, guid: 9591eda478aa1a54d9a552ea2efcf648,

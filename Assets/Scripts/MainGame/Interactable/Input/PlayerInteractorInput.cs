@@ -7,6 +7,9 @@ namespace gamer.maingame.interactable
 
     public class PlayerInteractorInput : MonoBehaviour, IInteractorInput
     {
+        [SerializeField] PlayerInputController _playerInputController;
+        [SerializeField] InputActionMapReference _menuInputActionMap;
+
         [SerializeField] InputActionReference _quitMinigameInputAction;
         [SerializeField] InputActionReference _interactInputAction;
 
@@ -32,7 +35,8 @@ namespace gamer.maingame.interactable
 
         void HandleMinigameQuitInput(InputAction.CallbackContext ctx)
         {
-            OnMinigameQuitInput?.Invoke();
+            if (!(_playerInputController.ActiveActionMap == _menuInputActionMap.Value))
+                OnMinigameQuitInput?.Invoke();
         }
     }
 }

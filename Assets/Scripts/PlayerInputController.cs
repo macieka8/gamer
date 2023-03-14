@@ -10,6 +10,7 @@ namespace gamer
         [SerializeField] string _defaultActionMap;
         [SerializeField] string _globalActionMap;
 
+        string _previousActionMap;
         InputActionMap _activeActionMap;
 
         public event System.Action OnActionMapChanged;
@@ -40,6 +41,7 @@ namespace gamer
             var newActionMap = _actions.FindActionMap(nameOrId, throwIfNotFound);
             if (newActionMap == null || _activeActionMap == newActionMap) return;
 
+            _previousActionMap = _activeActionMap.name;
             _activeActionMap.Disable();
             _activeActionMap = newActionMap;
             _activeActionMap.Enable();
@@ -49,8 +51,18 @@ namespace gamer
 
         public void RestoreDefaultActionMap()
         {
+            _previousActionMap = _activeActionMap.name;
             _activeActionMap.Disable();
             _activeActionMap = _actions.FindActionMap(_defaultActionMap, true);
+            _activeActionMap.Enable();
+        }
+
+        public void RestorePreviousActionMap()
+        {
+            var newPrevious = _activeActionMap.name;
+            _activeActionMap.Disable();
+            _activeActionMap = _actions.FindActionMap(_previousActionMap, true);
+            _previousActionMap = newPrevious;
             _activeActionMap.Enable();
         }
     }

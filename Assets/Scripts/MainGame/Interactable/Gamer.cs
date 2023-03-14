@@ -51,7 +51,7 @@ namespace gamer.maingame.interactable
         {
             if (_isFocusedOnInteractabe)
             {
-                UnfocusOnInteractable();
+                _foundGameMachine.DisconnectGamer(this);
             }
         }
 
@@ -67,9 +67,8 @@ namespace gamer.maingame.interactable
             }
         }
 
-        void UnfocusOnInteractable()
+        public void UnfocusInteracable()
         {
-            _foundGameMachine.DisconnectGamer(this);
             _currentlyUsedInputSenderMap = null;
             _inputMapController.RestoreDefaultGamerState();
             if (_isPlayer)

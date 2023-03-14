@@ -15,6 +15,7 @@ Shader "Custom/GrassGeneration"
 
 	SubShader
 	{
+		Cull off
 		Tags
 		{
 			"RenderType" = "Opaque"
@@ -23,12 +24,16 @@ Shader "Custom/GrassGeneration"
 		}
 
 		HLSLINCLUDE
+			#define TWO_PI 6.28318530718f
+
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
+			#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
 			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
 			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
 			#pragma multi_compile _ _SHADOWS_SOFT
+			#pragma multi_compile_fog
 
 			struct appdata
 			{
@@ -39,42 +44,63 @@ Shader "Custom/GrassGeneration"
 			struct v2f
 			{
 				float4 positionCS : SV_Position;
-				float4 positionWS : TEXCOORD0;
+				float3 positionWS : TEXCOORD0;
 				float2 uv : TEXCOORD1;
-				//float2 worldUV : TEXCOORD2; // Uncomment for Visualization of Wind Offset
+				float fogCoord : TEXCOORD2;
+				//float2 worldUV : TEXCOORD3; // Uncomment for Visualization of Wind Offset
 			};
 
 			struct GrassData
 			{
-				float4x4 transformMatrix;
+				float3 positionWS;
 				float2 worldUV;
 			};
 
-			StructuredBuffer<float3> _normals;
 			StructuredBuffer<float3> _positions;
 			StructuredBuffer<float2> _UVs;
-			StructuredBuffer<GrassData> _CulledGrassOutputBuffer;
+			StructuredBuffer<GrassData> _culledGrassOutputBuffer;
 
 			CBUFFER_START(UnityPerMaterial)
 				float4 _BaseColor;
 				float4 _TipColor;
 				float4 _AOColor;
+
 				float _WindOffsetMultiplier;
 				float _WindFrequency;
 				float _WindSpeed;
+
 				sampler2D _NoiseTex;
 				float4 _NoiseTex_ST;
 				float _NoiseFrequency;
 				float _NoiseAmplitude;
-
-				float _Cutoff;
 			CBUFFER_END
 
-			float2 CalculateWindOffset(float2 uv, float2 worldUV)
+			float CalculateWindOffset(float2 uv, float2 worldUV)
 			{
-				float noiseValue = tex2Dlod(_NoiseTex, float4(worldUV.xy * _NoiseFrequency, 0, 0)) * _NoiseAmplitude;
-				float windOffset = sin((worldUV.x + worldUV.y) * _WindFrequency + _Time * _WindSpeed + noiseValue) * max(uv.y, 0) * max(uv.y, 0) * _WindOffsetMultiplier;
-				return windOffset.xx;
+				float noiseValue = tex2Dlod(_NoiseTex, float4(worldUV.xy * _NoiseFrequency, 0, 0)).x * _NoiseAmplitude;
+				float yUV = max(uv.y, 0);
+				float windOffset = sin((worldUV.x + worldUV.y) * _WindFrequency + _Time.y * _WindSpeed + noiseValue) * yUV * yUV * _WindOffsetMultiplier;
+				return windOffset;
+			}
+
+			float4x4 rotationMatrixY(float angle)
+			{
+				float s, c;
+				sincos(angle, s, c);
+
+				return float4x4
+				(
+					 c, 0, s, 0,
+					 0, 1, 0, 0,
+					-s, 0, c, 0,
+					 0, 0, 0, 1
+				);
+			}
+
+			float randomRange(float2 seed, float min, float max)
+			{
+				float randnum = frac(sin(dot(seed, float2(12.9898, 78.233)))*43758.5453);
+				return lerp(min, max, randnum);
 			}
 		ENDHLSL
 
@@ -92,17 +118,23 @@ Shader "Custom/GrassGeneration"
 				v2f o;
 
 				float4 positionOS = float4(_positions[v.vertexID], 1.0f);
-				float4x4 objectToWorld = _CulledGrassOutputBuffer[v.instanceID].transformMatrix;
+				float3 objectToWorld = _culledGrassOutputBuffer[v.instanceID].positionWS;
 				float2 uv = _UVs[v.vertexID];
-				float2 worldUV = _CulledGrassOutputBuffer[v.instanceID].worldUV;
+				float2 worldUV = _culledGrassOutputBuffer[v.instanceID].worldUV;
+				
+				// Apply random rotation
 
-				float4 positionWS = mul(objectToWorld, positionOS);
+				float randomRotation = randomRange(worldUV, 0, TWO_PI);
+				positionOS = mul(rotationMatrixY(randomRotation), positionOS);
+
+				float3 positionWS = positionOS.xyz + objectToWorld;
 				float windOffset = CalculateWindOffset(uv, worldUV);
 				positionWS.xz += windOffset;
 
 				o.positionWS = positionWS;
-				o.positionCS = mul(UNITY_MATRIX_VP, o.positionWS);
+				o.positionCS = mul(UNITY_MATRIX_VP, float4(positionWS, 1));
 				o.uv = uv;
+				o.fogCoord = ComputeFogFactor(o.positionCS.z);
 				//o.worldUV = worldUV; // Uncomment for Visualization of Wind Offset
 				return o;
 			}
@@ -121,75 +153,23 @@ Shader "Custom/GrassGeneration"
 				color *= shadowColor;
 //#endif
 				// Uncomment for Visualization of Wind Offset
-				//float texNoise = tex2Dlod(_NoiseTex, float4(i.worldUV.xy * _NoiseFrequency, 0, 0)) * _NoiseAmplitude;
-				//float value = (sin((i.worldUV.x + i.worldUV.y) * _WindFrequency + _Time * _WindSpeed + texNoise) + 1) / 2;
+				//float value = (CalculateWindOffset(1, i.worldUV) / _WindOffsetMultiplier + 1) / 2;
 				//return float4(value, value, value, 1);
 				
 				float3 lightDir = GetMainLight().direction;
 				float ndotl = dot(lightDir, normalize(float3(0, 1, 0)));
 				float4 ao = lerp(_AOColor, 1.0f, i.uv.y);
-				return color * lerp(_BaseColor, _TipColor, i.uv.y) * ndotl * ao;
+				color *= lerp(_BaseColor, _TipColor, i.uv.y) * ndotl * ao;
+				float fogCoord;
+
+				fogCoord = i.fogCoord.x;
+
+				color.rgb = MixFog(color.rgb, fogCoord);
+				return color;
 			}
 
             ENDHLSL
         }
-
-		Pass
-		{
-			Name "ShadowCaster"
-			Tags { "LightMode" = "ShadowCaster" }
-
-			ZWrite On
-			ZTest LEqual
-
-			HLSLPROGRAM
-			#pragma vertex shadowVert
-			#pragma fragment shadowFrag
-
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
-			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
-
-			float3 _LightDirection;
-			float3 _LightPosition;
-
-			v2f shadowVert(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
-			{
-				v2f o;
-
-				float4 positionOS = float4(_positions[vertexID], 1.0f);
-				float3 normalOS = _normals[vertexID];
-				float4x4 objectToWorld = _CulledGrassOutputBuffer[instanceID].transformMatrix;
-				float2 uv = _UVs[vertexID];
-				float2 worldUV = _CulledGrassOutputBuffer[instanceID].worldUV;
-
-				float4 positionWS = mul(objectToWorld, positionOS);
-
-				positionWS.xz += CalculateWindOffset(uv, worldUV);
-				o.positionCS = mul(UNITY_MATRIX_VP, positionWS);
-				o.uv = uv;
-
-				float3 normalWS = TransformObjectToWorldNormal(normalOS);
-
-				// Code required to account for shadow bias.
-#if _CASTING_PUNCTUAL_LIGHT_SHADOW
-				float3 lightDirectionWS = normalize(_LightPosition - positionWS);
-#else
-				float3 lightDirectionWS = _LightDirection;
-#endif
-				o.positionWS = float4(ApplyShadowBias(positionWS, normalWS, lightDirectionWS), 1.0f);
-
-				return o;
-			}
-
-			float4 shadowFrag(v2f i) : SV_Target
-			{
-				return 0;
-			}
-
-			ENDHLSL
-		}
     }
 	Fallback Off
 }

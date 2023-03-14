@@ -4,6 +4,7 @@ namespace gamer.maingame.movement
 {
     public class CharacterMovement : MonoBehaviour
     {
+        [SerializeField] float _acceleration = 40f;
         [SerializeField] float _speed = 5f;
         [SerializeField] float _jumpHeight = 5f;
         [SerializeField] float _groundDistance = 0.2f;
@@ -13,6 +14,9 @@ namespace gamer.maingame.movement
         ICharacterMovementInput _input;
         Rigidbody _rigidbody;
         Camera _camera;
+
+        float _sqrSpeed;
+
         public Camera Cam { get {
             if (_camera == null) _camera = Camera.main;
             return _camera;
@@ -24,6 +28,7 @@ namespace gamer.maingame.movement
 
         void Awake()
         {
+            _sqrSpeed = _speed * _speed;
             _input = GetComponent<ICharacterMovementInput>();
             _rigidbody = GetComponent<Rigidbody>();
         }
@@ -54,8 +59,15 @@ namespace gamer.maingame.movement
 
         void FixedUpdate()
         {
-            var velocityDelta = _moveDir * _speed * Time.deltaTime;
-            _rigidbody.MovePosition(_rigidbody.position + velocityDelta);
+            var velocityDelta = _moveDir * _acceleration;
+            _rigidbody.AddForce(velocityDelta, ForceMode.Acceleration);
+            var horiznotalVelocity = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.z);
+            if (horiznotalVelocity.sqrMagnitude > _sqrSpeed)
+            {
+                var newHorizontalVelocity = horiznotalVelocity.normalized * _speed;
+                var newVelocity = new Vector3(newHorizontalVelocity.x, _rigidbody.velocity.y, newHorizontalVelocity.y);
+                _rigidbody.velocity = newVelocity;
+            }
         }
 
         void OnDisable()

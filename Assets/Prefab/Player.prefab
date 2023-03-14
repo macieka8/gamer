@@ -313,8 +313,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aead6ea709d5694494fc231ad9a055f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 5
-  _jumpHeight: 5
+  _acceleration: 40
+  _speed: 3.5
+  _jumpHeight: 1
   _groundDistance: 0.2
   _groundLayer:
     serializedVersion: 2
@@ -361,6 +362,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1212e66756c9394b9d68a63b5a4efd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerInputController: {fileID: 11400000, guid: e8341bec109752c45a4ece5bf9eddbc3,
+    type: 2}
+  _menuInputActionMap: {fileID: 11400000, guid: 954fa6609fb40094fb42951dd432fc08,
+    type: 2}
   _quitMinigameInputAction: {fileID: 4197197728306883864, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,
     type: 3}
   _interactInputAction: {fileID: 7665865297546535645, guid: c6c2ea926f5c5cc4ba1d1588e985ff14,

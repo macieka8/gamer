@@ -1,6 +1,6 @@
 #pragma kernel CalculateBladePositions
 
-RWStructuredBuffer<float4x4> _transformMatrices;
+RWStructuredBuffer<float3> _positionBuffer;
 StructuredBuffer<float2> _worldUVBuffer;
 StructuredBuffer<float> _terrainHeightBuffer;
 
@@ -8,14 +8,9 @@ uniform float _grassTerrainLengthX;
 uniform float _grassTerrainLengthZ;
 
 uniform float4x4 _terrainObjectToWorld;
-uniform float _minBladeHeight;
-uniform float _maxBladeHeight;
 uniform float _minOffset;
 uniform float _maxOffset;
-uniform float _bladeThicknessScale;
 uniform int _grassbladesCount;
-
-#define TWO_PI 6.28318530718f
 
 // Function that takes a 2-element seed and returns a random value
 // between the min and max bounds.
@@ -23,21 +18,6 @@ float randomRange(float2 seed, float min, float max)
 {
 	float randnum = frac(sin(dot(seed, float2(12.9898, 78.233)))*43758.5453);
 	return lerp(min, max, randnum);
-}
-
-// Function to rotate around the y-axis by a specified angle.
-float4x4 rotationMatrixY(float angle)
-{
-	float s, c;
-	sincos(angle, s, c);
-
-	return float4x4
-	(
-		 c, 0, s, 0,
-		 0, 1, 0, 0,
-		-s, 0, c, 0,
-		 0, 0, 0, 1
-	);
 }
 
 [numthreads(64, 1, 1)]
@@ -61,20 +41,10 @@ void CalculateBladePositions(uint3 id : SV_DispatchThreadID)
 	float2 randomSeed1 = float2(id.x, id.y);
 	float2 randomSeed2 = float2(id.y, id.x);
 
-	float scaleY = randomRange(randomSeed1, _minBladeHeight, _maxBladeHeight);
-
 	float offsetX = randomRange(randomSeed1, _minOffset, _maxOffset);
 	float offsetZ = randomRange(randomSeed2, _minOffset, _maxOffset);
 
-	float4x4 grassTransformMatrix = float4x4
-	(
-		_bladeThicknessScale,	0,		0,						bladePosition.x + offsetX,
-		0,						scaleY,	0,						bladePosition.y,
-		0,						0,		_bladeThicknessScale,	bladePosition.z + offsetZ,
-		0,						0,		0,						1
-	);
+	bladePosition = float3(bladePosition.x + offsetX, bladePosition.y, bladePosition.z + offsetZ);
 
-	float4x4 randomRotationMatrix = rotationMatrixY(randomRange(randomSeed1, 0.0f, TWO_PI));
-
-	_transformMatrices[id.x] = mul(_terrainObjectToWorld, mul(grassTransformMatrix, randomRotationMatrix));
+	_positionBuffer[id.x] = mul(_terrainObjectToWorld, float4(bladePosition, 1)).xyz;
 }

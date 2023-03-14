@@ -358,6 +358,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "MainMenuTrigger",
+                    "type": "Button",
+                    "id": "6ddaac54-b581-45ac-98dc-0e07a24e5e7f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -369,6 +378,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "QuitMinigame",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4b49d75e-3c5b-4b65-8ccc-eb98d09ed653",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "MainMenuTrigger",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -685,6 +705,12 @@
                     "isPartOfComposite": true
                 }
             ]
+        },
+        {
+            "name": "MainMenu",
+            "id": "261c9dd6-94cf-4307-84fa-5239944cec36",
+            "actions": [],
+            "bindings": []
         }
     ],
     "controlSchemes": [

@@ -87,6 +87,8 @@ namespace gamer.maingame.interactable
             if (entry == null) return;
             _minigame.InputSenderMapManager.ReleaseInputSenderMap(entry.Map);
             _connectedGamers.Remove(entry);
+
+            gamer.UnfocusInteracable();
         }
     }
 }

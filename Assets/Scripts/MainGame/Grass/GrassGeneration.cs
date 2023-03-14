@@ -8,24 +8,26 @@ namespace gamer
     {
         public struct GrassData
         {
-            public Matrix4x4 transformMatrix;
+            public Vector3 positionWS;
             public Vector2 worldUV;
         }
 
         public struct ChunkData
         {
             public GraphicsBuffer argsBuffer;
-            public GraphicsBuffer transformMatrixBuffer;
+            public GraphicsBuffer positionBuffer;
             public GraphicsBuffer worldUVsBuffer; 
             public GraphicsBuffer terrainHeightBuffer;
-            public GraphicsBuffer culledtransformMatrixBuffer;
+            public GraphicsBuffer culledPositionBuffer;
             public Bounds bounds;
+            public bool isEmpty;
+
+            public static ChunkData EmptyChunk => new ChunkData { isEmpty = true };
         }
 
-        [SerializeField] ComputeShader _computeShader;
+        [SerializeField] ComputeShader _grassGenerationShader;
         [SerializeField] Mesh _grassMesh;
         [SerializeField] Material _grassMaterial;
-        [SerializeField] TerrainData _terrainData;
         [SerializeField] Terrain _terrain;
 
         [Header("Grass Options")]
@@ -42,16 +44,15 @@ namespace gamer
         [Header("Grass Blade Options")]
         
         [Range(0.0f, 5.0f)]
-        [SerializeField] float _minBladeHeight;
-        [Range(0.0f, 5.0f)]
-        [SerializeField] float _maxBladeHeight;
+        [SerializeField] float _bladeHeight;
+
+        [SerializeField] float _bladeThicknessScale;
         
         [Range(-1.0f, 1.0f)]
         [SerializeField] float _minOffset;
         [Range(-1.0f, 1.0f)]
         [SerializeField] float _maxOffset;
 
-        [SerializeField] float _bladeThicknessScale;
 
         [Header("Culling Data")]
         [SerializeField] ComputeShader _cullGrassShader;
@@ -71,9 +72,12 @@ namespace gamer
         int _numGroupScanThreadGroups;
 
         ChunkData[] _chunks;
+        float[,,] _terrainAlphaMap;
 
         void Start()
         {
+            _terrainAlphaMap = _terrain.terrainData.GetAlphamaps(
+                0, 0, _terrain.terrainData.alphamapWidth, _terrain.terrainData.alphamapHeight);
             CreateSharedBuffers();
 
             CreateChunks();
@@ -94,7 +98,8 @@ namespace gamer
 
             for (int i = 0; i < _chunks.Length; i++)
             {
-                _propertyBlock.SetBuffer("_CulledGrassOutputBuffer", _chunks[i].culledtransformMatrixBuffer);
+                if (_chunks[i].isEmpty) continue;
+                _propertyBlock.SetBuffer("_culledGrassOutputBuffer", _chunks[i].culledPositionBuffer);
 
                 CullGrass(VP, _chunks[i]);
                 Graphics.DrawMeshInstancedIndirect(_grassMesh, 0, _grassMaterial, _chunks[i].bounds, _chunks[i].argsBuffer,
@@ -116,11 +121,12 @@ namespace gamer
 
             for (int i = 0; i < _chunks.Length; i++)
             {
+                if (_chunks[i].isEmpty) continue;
                 _chunks[i].argsBuffer.Dispose();
-                _chunks[i].transformMatrixBuffer.Dispose();
+                _chunks[i].positionBuffer.Dispose();
                 _chunks[i].worldUVsBuffer.Dispose();
                 _chunks[i].terrainHeightBuffer.Dispose();
-                _chunks[i].culledtransformMatrixBuffer.Dispose();
+                _chunks[i].culledPositionBuffer.Dispose();
             }
         }
 
@@ -150,14 +156,24 @@ namespace gamer
                 var localChunkCoords = new Vector2(i % _chunkGrassResolution, i / _chunkGrassResolution);
                 var uv = (worldOffset + localChunkCoords) / worldResolution;
 
-                worldUVs.Add(uv);
+                var alphaMapCoordinate = new Vector2Int(
+                    (int)(uv.x * _terrain.terrainData.alphamapWidth),
+                    (int)(uv.y * _terrain.terrainData.alphamapHeight));
+                //if (alphaMapCoordinate.y >= _terrainAlphaMap.GetLength(0)) continue;
+                //if (alphaMapCoordinate.x >= _terrainAlphaMap.GetLength(1)) continue;
+                if (_terrainAlphaMap[alphaMapCoordinate.y, alphaMapCoordinate.x, 0] > 0f)
+                    worldUVs.Add(uv);
             }
 
+            if (worldUVs.Count == 0)
+            {
+                return ChunkData.EmptyChunk;
+            }
             // Get terrain heights
             var terrainHeights = new float[worldUVs.Count];
             for (int i = 0; i < worldUVs.Count; i++)
             {
-                terrainHeights[i] = _terrainData.GetInterpolatedHeight(worldUVs[i].x, worldUVs[i].y);
+                terrainHeights[i] = _terrain.terrainData.GetInterpolatedHeight(worldUVs[i].x, worldUVs[i].y);
             }
 
             // Create world UV buffer
@@ -170,23 +186,22 @@ namespace gamer
             terrainHeightBuffer.SetData(terrainHeights);
 
             // Create transformations buffer
-            var transformMatrixBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, terrainHeights.Length, sizeof(float) * 16);
-
-            var culledtransformMatrixBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, terrainHeights.Length, sizeof(float) * (16 + 2));
+            var positionBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, terrainHeights.Length, sizeof(float) * 3);
+            var culledPositionBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, terrainHeights.Length, sizeof(float) * (3 + 2));
 
             // Bounds
             var bounds = new Bounds();
 
             var chunkTerrainSize = new Vector3(
-                _terrainData.size.x / _chunksPerDimension,
-                _terrainData.size.y,
-                _terrainData.size.z / _chunksPerDimension);
+                _terrain.terrainData.size.x / _chunksPerDimension,
+                _terrain.terrainData.size.y,
+                _terrain.terrainData.size.z / _chunksPerDimension);
             var offsetToCenter = new Vector3(chunkTerrainSize.x / 2f, 0f, chunkTerrainSize.z / 2f);
             var chunkTerrainOffset = new Vector3(xChunkOffset * chunkTerrainSize.x, 0f, yChunkOffset * chunkTerrainSize.z);
 
             bounds.center = _terrain.GetPosition() + offsetToCenter + chunkTerrainOffset;
             bounds.size = chunkTerrainSize;
-            bounds.Expand(_maxBladeHeight);
+            bounds.Expand(_bladeHeight);
 
             // Args
             var args = new uint[5] { 0u, 0u, 0u, 0u, 0u };
@@ -201,11 +216,12 @@ namespace gamer
             var chunkData = new ChunkData
             {
                 argsBuffer = argsBuffer,
-                transformMatrixBuffer = transformMatrixBuffer,
+                positionBuffer = positionBuffer,
                 worldUVsBuffer = worldUVBuffer,
                 terrainHeightBuffer = terrainHeightBuffer,
-                culledtransformMatrixBuffer = culledtransformMatrixBuffer,
-                bounds = bounds
+                culledPositionBuffer = culledPositionBuffer,
+                bounds = bounds,
+                isEmpty = false
             };
 
             return chunkData;
@@ -213,29 +229,35 @@ namespace gamer
 
         void ComputeChunkData(ChunkData chunk)
         {
-            _computeShader.SetFloat("_grassTerrainLengthX", _terrainData.size.x);
-            _computeShader.SetFloat("_grassTerrainLengthZ", _terrainData.size.z);
+            if (chunk.isEmpty) return;
+            _grassGenerationShader.SetFloat("_grassTerrainLengthX", _terrain.terrainData.size.x);
+            _grassGenerationShader.SetFloat("_grassTerrainLengthZ", _terrain.terrainData.size.z);
 
-            _computeShader.SetMatrix("_terrainObjectToWorld", transform.localToWorldMatrix);
-            _computeShader.SetFloat("_minBladeHeight", _minBladeHeight);
-            _computeShader.SetFloat("_maxBladeHeight", _maxBladeHeight);
-            _computeShader.SetFloat("_minOffset", _minOffset);
-            _computeShader.SetFloat("_maxOffset", _maxOffset);
-            _computeShader.SetFloat("_bladeThicknessScale", _bladeThicknessScale);
-            _computeShader.SetInt("_grassbladesCount", chunk.transformMatrixBuffer.count);
+            _grassGenerationShader.SetMatrix("_terrainObjectToWorld", Matrix4x4.Translate(
+                _terrain.GetPosition() + new Vector3(_terrain.terrainData.size.x / 2f, 0f, _terrain.terrainData.size.z / 2f)));
+            _grassGenerationShader.SetFloat("_minOffset", _minOffset);
+            _grassGenerationShader.SetFloat("_maxOffset", _maxOffset);
+            _grassGenerationShader.SetInt("_grassbladesCount", chunk.positionBuffer.count);
 
-            _computeShader.SetBuffer(0, "_transformMatrices", chunk.transformMatrixBuffer);
-            _computeShader.SetBuffer(0, "_worldUVBuffer", chunk.worldUVsBuffer);
-            _computeShader.SetBuffer(0, "_terrainHeightBuffer", chunk.terrainHeightBuffer);
+            _grassGenerationShader.SetBuffer(0, "_positionBuffer", chunk.positionBuffer);
+            _grassGenerationShader.SetBuffer(0, "_worldUVBuffer", chunk.worldUVsBuffer);
+            _grassGenerationShader.SetBuffer(0, "_terrainHeightBuffer", chunk.terrainHeightBuffer);
 
-            _computeShader.GetKernelThreadGroupSizes(0, out var threadGroupSize, out _, out _);
-            int threadGroups = Mathf.CeilToInt(chunk.transformMatrixBuffer.count / threadGroupSize);
-            _computeShader.Dispatch(0, threadGroups, 1, 1);
+            _grassGenerationShader.GetKernelThreadGroupSizes(0, out var threadGroupSize, out _, out _);
+            int threadGroups = Mathf.CeilToInt(chunk.positionBuffer.count / threadGroupSize);
+            _grassGenerationShader.Dispatch(0, threadGroups, 1, 1);
         }
 
         void CreateSharedBuffers()
         {
             Vector3[] grassVertices = _grassMesh.vertices;
+            for (int i = 0; i < grassVertices.Length; i++)
+            {
+                grassVertices[i] = new Vector3(
+                    grassVertices[i].x * _bladeThicknessScale,
+                    grassVertices[i].y * _bladeHeight,
+                    grassVertices[i].z * _bladeThicknessScale);
+            }
             _grassVertexBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, grassVertices.Length, sizeof(float) * 3);
             _grassVertexBuffer.SetData(grassVertices);
 
@@ -271,36 +293,36 @@ namespace gamer
 
             #region SetupComputeShader
             // Vote
-            _cullGrassShader.SetBuffer(0, "_VoteBuffer", _voteBuffer);
-            _cullGrassShader.SetFloat("_Distance", _distanceCutoff);
+            _cullGrassShader.SetBuffer(0, "_voteBuffer", _voteBuffer);
+            _cullGrassShader.SetFloat("_distance", _distanceCutoff);
 
             // Scan Instances
-            _cullGrassShader.SetBuffer(1, "_VoteBuffer", _voteBuffer);
-            _cullGrassShader.SetBuffer(1, "_ScanBuffer", _scanBuffer);
-            _cullGrassShader.SetBuffer(1, "_GroupSumArray", _groupSumArrayBuffer);
+            _cullGrassShader.SetBuffer(1, "_voteBuffer", _voteBuffer);
+            _cullGrassShader.SetBuffer(1, "_scanBuffer", _scanBuffer);
+            _cullGrassShader.SetBuffer(1, "_groupSumArray", _groupSumArrayBuffer);
 
             // Scan Groups
-            _cullGrassShader.SetInt("_NumOfGroups", _numThreadGroups);
-            _cullGrassShader.SetBuffer(2, "_GroupSumArrayIn", _groupSumArrayBuffer);
-            _cullGrassShader.SetBuffer(2, "_GroupSumArrayOut", _scannedGroupSumBuffer);
+            _cullGrassShader.SetInt("_numOfGroups", _numThreadGroups);
+            _cullGrassShader.SetBuffer(2, "_groupSumArrayIn", _groupSumArrayBuffer);
+            _cullGrassShader.SetBuffer(2, "_groupSumArrayOut", _scannedGroupSumBuffer);
 
             // Compact
-            _cullGrassShader.SetBuffer(3, "_VoteBuffer", _voteBuffer);
-            _cullGrassShader.SetBuffer(3, "_ScanBuffer", _scanBuffer);
-            _cullGrassShader.SetBuffer(3, "_GroupSumArray", _scannedGroupSumBuffer);
+            _cullGrassShader.SetBuffer(3, "_voteBuffer", _voteBuffer);
+            _cullGrassShader.SetBuffer(3, "_scanBuffer", _scanBuffer);
+            _cullGrassShader.SetBuffer(3, "_groupSumArray", _scannedGroupSumBuffer);
             #endregion
         }
 
         void CullGrass(Matrix4x4 VP, ChunkData chunk)
         {
             // Reset instance count
-            _cullGrassShader.SetBuffer(4, "_ArgsBuffer", chunk.argsBuffer);
+            _cullGrassShader.SetBuffer(4, "_argsBuffer", chunk.argsBuffer);
             _cullGrassShader.Dispatch(4, 1, 1, 1);
 
             // Vote
             _cullGrassShader.SetMatrix("MATRIX_VP", VP);
-            _cullGrassShader.SetVector("_CameraPosition", Camera.main.transform.position);
-            _cullGrassShader.SetBuffer(0, "_transformMatrices", chunk.transformMatrixBuffer);
+            _cullGrassShader.SetVector("_cameraPosition", Camera.main.transform.position);
+            _cullGrassShader.SetBuffer(0, "_positionBuffer", chunk.positionBuffer);
             _cullGrassShader.Dispatch(0, _numVoteThreadGroups, 1, 1);
 
             // Scan Instances
@@ -310,10 +332,10 @@ namespace gamer
             _cullGrassShader.Dispatch(2, _numGroupScanThreadGroups, 1, 1);
 
             // Compact
-            _cullGrassShader.SetBuffer(3, "_transformMatrices", chunk.transformMatrixBuffer);
+            _cullGrassShader.SetBuffer(3, "_positionBuffer", chunk.positionBuffer);
             _cullGrassShader.SetBuffer(3, "_worldUV", chunk.worldUVsBuffer);
-            _cullGrassShader.SetBuffer(3, "_CulledGrassOutputBuffer", chunk.culledtransformMatrixBuffer);
-            _cullGrassShader.SetBuffer(3, "_ArgsBuffer", chunk.argsBuffer);
+            _cullGrassShader.SetBuffer(3, "_culledGrassOutputBuffer", chunk.culledPositionBuffer);
+            _cullGrassShader.SetBuffer(3, "_argsBuffer", chunk.argsBuffer);
             _cullGrassShader.Dispatch(3, _numThreadGroups, 1, 1);
         }
     }

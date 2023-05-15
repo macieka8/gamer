@@ -1,0 +1,50 @@
+#pragma kernel CalculateBladePositions
+
+RWStructuredBuffer<float3> _positionBuffer;
+StructuredBuffer<float2> _worldUVBuffer;
+StructuredBuffer<float> _terrainHeightBuffer;
+
+uniform float _grassTerrainLengthX;
+uniform float _grassTerrainLengthZ;
+
+uniform float4x4 _terrainObjectToWorld;
+uniform float _minOffset;
+uniform float _maxOffset;
+uniform int _grassbladesCount;
+
+// Function that takes a 2-element seed and returns a random value
+// between the min and max bounds.
+float randomRange(float2 seed, float min, float max)
+{
+	float randnum = frac(sin(dot(seed, float2(12.9898, 78.233)))*43758.5453);
+	return lerp(min, max, randnum);
+}
+
+[numthreads(64, 1, 1)]
+void CalculateBladePositions(uint3 id : SV_DispatchThreadID)
+{
+	// Avoid running 'overflow' tasks when the number of tasks
+	// wasn't divisible by the number of threads.
+	if (id.x > (uint)_grassbladesCount)
+	{
+		return;
+	}
+
+	float2 worldUV = _worldUVBuffer[id.x];
+
+	float2 startPosition = float2(- _grassTerrainLengthX / 2.0f, - _grassTerrainLengthZ / 2.0f);
+	float3 bladePosition = float3(
+		startPosition.x + worldUV.x * _grassTerrainLengthX,
+		_terrainHeightBuffer[id.x],
+		startPosition.y + worldUV.y * _grassTerrainLengthZ);
+
+	float2 randomSeed1 = float2(id.x, id.y);
+	float2 randomSeed2 = float2(id.y, id.x);
+
+	float offsetX = randomRange(randomSeed1, _minOffset, _maxOffset);
+	float offsetZ = randomRange(randomSeed2, _minOffset, _maxOffset);
+
+	bladePosition = float3(bladePosition.x + offsetX, bladePosition.y, bladePosition.z + offsetZ);
+
+	_positionBuffer[id.x] = mul(_terrainObjectToWorld, float4(bladePosition, 1)).xyz;
+}

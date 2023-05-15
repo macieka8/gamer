@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ca058a7d18175f40b791c0784b5a956, type: 3}
+  m_Name: Pong
+  m_EditorClassIdentifier: 
+  _sceneName: PongScene
+  _inputActionMapName: Pong
+  _minigameTexture: {fileID: 8400000, guid: 587ed2bb2afa27a48bcb66a4994472f5, type: 2}
+  _minigameMaterial: {fileID: 2100000, guid: 7c97d500ce6ec204eab6b9cfed07ee2b, type: 2}
+  _input: {fileID: 11400000, guid: e8341bec109752c45a4ece5bf9eddbc3, type: 2}
+  _maxPlayerCount: 2
